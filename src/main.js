@@ -17,14 +17,20 @@ addEventListener("keydown", (event) => {
 
     console.log(event)
 
+    if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
+        return false
+    }
+
     if (event.code === 'KeyJ') postFeed.moveToNextPost()
     if (event.code === 'KeyK') postFeed.moveToPreviousPost()
     if (event.code === 'KeyL') postFeed.likeToggleCurrentPost()
-    if (event.code === 'KeyR' && event.ctrlKey === false) postFeed.replyToCurrentPost()
+    if (event.code === 'KeyR') postFeed.replyToCurrentPost()
     // if (event.code === 'KeyT') // repost / quote repost
     // if (event.code === 'KeyN') // new post 
-    // if (event.code === 'Slash' && event.shiftKey === true) // show shortcuts
+    // if (event.code === 'Slash') // show shortcuts
     if (event.code === 'Enter') postFeed.openCurrentPost()
+    // if (event.code === 'Period') // load news posts
+    
 })
 
 function waitForElement(selector) {
