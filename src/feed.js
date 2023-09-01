@@ -41,14 +41,31 @@ export class Feed {
         this.currentPost.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" })
     }
 
+    /**
+     * Open the selected post
+     * 
+     * The first instance of a url that matches the regex below should be the link for a given post
+     * 
+     * Todo: Replies that show up in a feed would need to be handled differently
+     */
     openCurrentPost() {
-        
+        let links = this.currentPost.querySelectorAll('a[role="link"]')
+
+        // here's a really bad regex that should probably be fixed
+        const re = /^https:\/\/bsky.app\/profile\/.*\/post\/[a-zA-Z0-9]*$/
+        links.forEach(element => {
+            if (re.exec(element.href)) element.click()
+        });
     }
+
+    quoteCurrentPost() {}
 
     replyToCurrentPost() {
         let reply = this.currentPost.querySelector('[aria-label*="Reply ("')
         reply.click()
     }
+
+    repostCurrentPost() {}
 
     toggleCurrentPostHighlight() {
         this.previousPost.style.removeProperty('border')

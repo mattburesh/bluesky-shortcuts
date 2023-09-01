@@ -22,7 +22,7 @@ addEventListener("keydown", (event) => {
     // if (event.code === 'KeyT') // repost / quote repost
     // if (event.code === 'KeyN') // new post 
     // if (event.code === 'Slash' && event.shiftKey === true) // show shortcuts
-    // if (event.code === 'Enter') // open post
+    if (event.code === 'Enter') postFeed.openCurrentPost()
 })
 
 function waitForElement(selector) {
