@@ -15,10 +15,12 @@ addEventListener("keydown", (event) => {
     if (ready === false) return false
     if (this === document.activeElement) return false // ignore if you're typing? probably needs elaboration
 
+    console.log(event)
+
     if (event.code === 'KeyJ') postFeed.moveToNextPost()
     if (event.code === 'KeyK') postFeed.moveToPreviousPost()
     if (event.code === 'KeyL') postFeed.likeToggleCurrentPost()
-    if (event.code === 'KeyR') postFeed.replyToCurrentPost()
+    if (event.code === 'KeyR' && event.ctrlKey === false) postFeed.replyToCurrentPost()
     // if (event.code === 'KeyT') // repost / quote repost
     // if (event.code === 'KeyN') // new post 
     // if (event.code === 'Slash' && event.shiftKey === true) // show shortcuts
