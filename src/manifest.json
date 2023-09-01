@@ -14,7 +14,7 @@
     "content_scripts": [
         {
             "matches": ["*://*.bsky.app/*"],
-            "js": [ "bsky-shortcuts.js"]
+            "js": [ "main.js"]
         }
     ]
 }
