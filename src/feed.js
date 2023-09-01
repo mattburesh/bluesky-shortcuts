@@ -60,6 +60,8 @@ export class Feed {
 
     quoteCurrentPost() {}
 
+    reloadFeed() {}
+
     replyToCurrentPost() {
         let reply = this.currentPost.querySelector('[aria-label*="Reply ("')
         reply.click()

@@ -12,14 +12,14 @@ waitForElement('div[data-testid="followingFeedPage-feed-flatlist"] > div').then(
 })
 
 addEventListener("keydown", (event) => {
+    // ignore shortcuts if the feed hasn't loaded yet
     if (ready === false) return false
-    if (this === document.activeElement) return false // ignore if you're typing? probably needs elaboration
 
-    console.log(event)
+    // ignore shortcuts if the reply/post window is open
+    if (document.getElementsByClassName("ProseMirror-focused").length > 0) return false
 
-    if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
-        return false
-    }
+    // ignore shortcuts if a modifier key is being held down
+    if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return false
 
     if (event.code === 'KeyJ') postFeed.moveToNextPost()
     if (event.code === 'KeyK') postFeed.moveToPreviousPost()
@@ -53,6 +53,7 @@ function waitForElement(selector) {
     })
 }
 
+// unsure if this will be needed in the future
 function querySelectorAllLive(element, selector) {
     let result = Array.prototype.slice.call(element.querySelectorAll(selector))
     console.log(result)
