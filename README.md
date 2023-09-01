@@ -5,6 +5,13 @@ A Firefox extension for adding shortcuts to bsky.app.
 
 ## Install
 
+1. Make sure your `Node.js` version is >= 16
+2. Run `npm install`
+3. Run `npx webpack --config webpack.config.js`
+4. Visit the firefox addon debuggin page
+    1. or enter `about:debugging#/runtime/this-firefox` in the address bar
+5. Click `Load Temporary Add-on`, and select `bsky-shortcuts/build`
+
 ## Shortcuts 
 
 | Key | Action | Status|
@@ -18,4 +25,3 @@ A Firefox extension for adding shortcuts to bsky.app.
 | Enter | Open Post | In Progress |
 | ?   | Show Shortcuts | In Progress |
 
-## Development 
