@@ -45,6 +45,11 @@ export class Feed {
         
     }
 
+    replyToCurrentPost() {
+        let reply = this.currentPost.querySelector('[aria-label*="Reply ("')
+        reply.click()
+    }
+
     toggleCurrentPostHighlight() {
         this.previousPost.style.removeProperty('border')
         this.nextPost.style.removeProperty('border')

@@ -2,7 +2,6 @@
 
 A Firefox extension for adding shortcuts to bsky.app.
 
-
 ## Install
 
 1. Make sure your `Node.js` version is >= 16
@@ -19,7 +18,7 @@ A Firefox extension for adding shortcuts to bsky.app.
 | J   | Move Down | Working |
 | K   | Move Up | Working |
 | L   | Like Post | Working |
-| R   | Reply  | In Progress |
+| R   | Reply  | Working |
 | T   | Repost / Quote | In Progress |
 | N   | New Post | In Progress |
 | Enter | Open Post | In Progress |

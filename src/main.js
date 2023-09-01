@@ -18,7 +18,7 @@ addEventListener("keydown", (event) => {
     if (event.code === 'KeyJ') postFeed.moveToNextPost()
     if (event.code === 'KeyK') postFeed.moveToPreviousPost()
     if (event.code === 'KeyL') postFeed.likeToggleCurrentPost()
-    // if (event.code === 'KeyR') // reply
+    if (event.code === 'KeyR') postFeed.replyToCurrentPost()
     // if (event.code === 'KeyT') // repost / quote repost
     // if (event.code === 'KeyN') // new post 
     // if (event.code === 'Slash' && event.shiftKey === true) // show shortcuts
