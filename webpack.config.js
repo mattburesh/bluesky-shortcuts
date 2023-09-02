@@ -1,13 +1,11 @@
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
-
+const { verify } = require('crypto')
+const { VERSION } = require('ejs')
+const { version } = require('os')
 const path = require('path')
 
 const isProduction = process.env.NODE_ENV == 'production'
 
-
 const stylesHandler = 'style-loader'
-
-
 
 const config = {
     entry: './src/main.js',
