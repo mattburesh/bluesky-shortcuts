@@ -1,12 +1,12 @@
 {
   "name": "bsky-shortcuts",
-  "version": "0.3.3",
+  "version": "0.3.2",
   "description": "Adds keyboard shortcuts to bsky.app",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
-    "bump": "npm version patch && node bin/bump-version.js",
+    "bump": "node bin/bump-version.js",
     "watch": "webpack --watch"
   },
   "devDependencies": {
