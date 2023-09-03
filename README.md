@@ -4,6 +4,10 @@ A Firefox extension for adding shortcuts to bsky.app.
 
 ## Install
 
+[![Available from FireFox Add-ons](assets/firefox.png)](https://addons.mozilla.org/en-US/firefox/addon/bsky-shortcuts/)
+
+## Development
+
 1. Make sure your `Node.js` version is >= 16
 2. Run `npm install`
 3. Run `npx webpack --config webpack.config.js`
