@@ -2,8 +2,10 @@ const { verify } = require('crypto')
 const { VERSION } = require('ejs')
 const { version } = require('os')
 const path = require('path')
+const CopyPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV == 'production'
+let buildPath = isProduction ? 'dist/' : 'build/'
 
 const stylesHandler = 'style-loader'
 
@@ -15,6 +17,11 @@ const config = {
     plugins: [
         // Add your plugins here
         // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+        new CopyPlugin({
+            patterns: [
+                { from: "src/manifest.json" }
+            ]
+        })
     ],
     module: {
         rules: [

@@ -3,10 +3,11 @@ export class Feed {
     previousPost;
     currentPost;
     nextPost;
+    feedList = []
 
     constructor(postElements) {
+        this.getPinnedFeeds()
         this.nextPost = postElements.children[0]
-        console.log('Feed object constructed')
     }
 
     get previousPost() { return this.previousPost }
@@ -18,9 +19,48 @@ export class Feed {
     get nextPost() { return this.nextPost}
     set nextPost(post) { this.nextPost = post }
 
+    cycleFeeds() {
+        let done = false 
+        for (let i = 0; i < this.feedList.length; i++) {
+            if (done === true) {
+                this.feedList[i].activetab = true
+                this.feedList[i].click()
+                break
+            }
+
+            if (this.feedList[i].activetab === true) {
+                this.feedList[i].activetab = false
+                done = true
+            }
+
+            if (i === this.feedList.length - 1) {
+                this.feedList[i].activetab = false
+                this.feedList[0].activetab = true
+                this.feedList[0].click()
+                break
+            }
+        }
+    }
+
+    getPinnedFeeds() {
+        let feeds = document.querySelector('[data-testid="homeScreenFeedTabs"] > div > div').children
+
+        for (let item of feeds) {
+            if (item.style.borderBottomColor === "rgb(0, 133, 255)") {
+                item.activetab = true
+            } 
+            this.feedList.push(item)
+        }
+    }
+
     likeToggleCurrentPost() {
         let like = this.currentPost.querySelector('[aria-label*="Like ("') ?? this.currentPost.querySelector('[aria-label*="Unlike ("')
         like.click()
+    }
+
+    loadNewPosts() {
+        let loadPostsButton = document.querySelector('[aria-label*="Load new posts"') ?? null
+        if (loadPostsButton) loadPostsButton.click()
     }
 
     moveToNextPost() {
