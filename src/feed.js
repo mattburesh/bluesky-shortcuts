@@ -38,6 +38,7 @@ export class Feed {
     cycleFeeds() {
         console.log('cycle called...')
         // rebuild the list of feeds
+        if (this.currentPost) this.currentPost.style.removeProperty("border")
         this.rebuildFeeds()
 
         // loop through the feeds, and switch to the next one
