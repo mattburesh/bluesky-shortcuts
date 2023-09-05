@@ -8,11 +8,8 @@ export class Feed {
 
     constructor(postElements) {
         this.getPinnedFeeds()
-        this.feeds = document.querySelectorAll(
-            '[data-testid*="-feed-flatlist"]'
-        )
+        this.checkFeedStatus()
         this.nextPost = postElements.children[0]
-        console.log(this.nextPost)
     }
 
     get previousPost() {
@@ -40,9 +37,12 @@ export class Feed {
         this.feeds = document.querySelectorAll(
             '[data-testid*="-feed-flatlist"]'
         )
+        console.log("Checking Feeds...")
+        console.log(this.feeds)
     }
 
     cycleFeeds() {
+        this.checkFeedStatus()
         let done = false
 
         for (let i = 0; i < this.feeds.length; i++) {
@@ -52,42 +52,18 @@ export class Feed {
 
             if (i === this.feedListButtons.length - 1) {
                 this.feedListButtons[0].click()
-                // this.setActiveFeed(this.feeds[i].children[0])
-                console.log(this.feeds[i].childNodes[0].childNodes[0])
-                this.setActiveFeed(this.feeds[i].childNodes.item(0))
+                this.setActiveFeed(this.feeds[i].children[0])
+                // this.setActiveFeed(this.feeds[i].childNodes.item(0))
                 break
             }
 
             if (this.feeds[i].offsetParent !== null) {
                 this.feedListButtons[i + 1].click()
-                // this.setActiveFeed(this.feeds[i + 1].children[0])
-                console.log(this.feeds[i + 1].childNodes[0].childNodes[0])
-                this.setActiveFeed(this.feeds[i + 1].childNodes.item(0))
+                this.setActiveFeed(this.feeds[i + 1].children[0])
+                // this.setActiveFeed(this.feeds[i + 1].childNodes.item(0))
                 break
             }
         }
-
-        // for (let i = 0; i < this.feedList.length; i++) {
-        //     if (done === true) {
-        //         this.feedList[i].activetab = true
-        //         this.feedList[i].click()
-        //         // this.rebuildActiveFeed(this.feedList[i])
-        //         break
-        //     }
-
-        //     if (this.feedList[i].activetab === true) {
-        //         this.feedList[i].activetab = false
-        //         done = true
-        //     }
-
-        //     if (i === this.feedList.length - 1) {
-        //         this.feedList[i].activetab = false
-        //         this.feedList[0].activetab = true
-        //         this.feedList[0].click()
-        //         this.rebuildActiveFeed(this.feedList[0])
-        //         break
-        //     }
-        // }
     }
 
     getPinnedFeeds() {
@@ -161,10 +137,6 @@ export class Feed {
 
     quoteCurrentPost() {}
 
-    rebuildActiveFeed(feed) {
-        let test = document.querySelectorAll('[data-testid*="-feed-flatlist"]')
-    }
-
     replyToCurrentPost() {
         let reply = this.currentPost.querySelector('[aria-label*="Reply ("')
         reply.click()
@@ -172,12 +144,10 @@ export class Feed {
 
     repostCurrentPost() {}
 
-    setActiveFeed(feed) {
+    setActiveFeed(postElements) {
         this.previousPost = null
         this.currentPost = null
-        this.nextPost = feed.childNodes.item(0)
-
-        // this.debugPostStatus()
+        this.nextPost = postElements.children[0]
     }
 
     toggleCurrentPostHighlight() {

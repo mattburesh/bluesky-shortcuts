@@ -25,7 +25,7 @@ addEventListener("keydown", (event) => {
     if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey)
         return false
 
-    postFeed.checkFeedStatus()
+    // postFeed.checkFeedStatus()
 
     if (event.code === "KeyJ") postFeed.moveToNextPost()
     if (event.code === "KeyK") postFeed.moveToPreviousPost()
