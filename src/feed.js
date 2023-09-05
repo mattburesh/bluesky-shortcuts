@@ -5,10 +5,12 @@ export class Feed {
     currentPost
     nextPost
     feedListButtons = []
+    reload = true
 
     constructor(postElements) {
         this.getPinnedFeeds()
-        this.checkFeedStatus()
+        this.rebuildFeeds()
+        this.activeFeed = 0
         this.nextPost = postElements.children[0]
     }
 
@@ -33,37 +35,30 @@ export class Feed {
         this.nextPost = post
     }
 
-    checkFeedStatus() {
-        this.feeds = document.querySelectorAll(
-            '[data-testid*="-feed-flatlist"]'
-        )
-        console.log("Checking Feeds...")
-        console.log(this.feeds)
-    }
-
     cycleFeeds() {
-        this.checkFeedStatus()
-        let done = false
+        console.log('cycle called...')
+        // rebuild the list of feeds
+        this.rebuildFeeds()
 
+        // loop through the feeds, and switch to the next one
         for (let i = 0; i < this.feeds.length; i++) {
-            // if (done === true) {
-
-            // }
-
-            if (i === this.feedListButtons.length - 1) {
+            // if we're on the last iteration, reset to the beginning
+            if (this.activeFeed === (this.feedListButtons.length - 1)) {
+                this.activeFeed = 0
                 this.feedListButtons[0].click()
-                this.setActiveFeed(this.feeds[i].children[0])
-                // this.setActiveFeed(this.feeds[i].childNodes.item(0))
+                this.reload = false
                 break
             }
 
-            if (this.feeds[i].offsetParent !== null) {
-                this.feedListButtons[i + 1].click()
-                this.setActiveFeed(this.feeds[i + 1].children[0])
-                // this.setActiveFeed(this.feeds[i + 1].childNodes.item(0))
+            // otherwise, increment the active feed and click the corresponding button
+            if (i === (this.activeFeed + 1)) {
+                this.activeFeed++
+                this.feedListButtons[i].click()
                 break
             }
         }
+
+        this.reinitializePostValues(this.feeds[this.activeFeed])
     }
 
     getPinnedFeeds() {
@@ -135,6 +130,12 @@ export class Feed {
         })
     }
 
+    rebuildFeeds() {
+        this.feeds = Array.from(document.querySelectorAll(
+            '[data-testid*="-feed-flatlist"]'
+        ))
+    }
+
     quoteCurrentPost() {}
 
     replyToCurrentPost() {
@@ -144,10 +145,27 @@ export class Feed {
 
     repostCurrentPost() {}
 
-    setActiveFeed(postElements) {
-        this.previousPost = null
-        this.currentPost = null
-        this.nextPost = postElements.children[0]
+    /**
+     * This is an extremely stupid solution for feed cycling
+     *
+     * Every time we cycle to the next feed we need to wait for it's posts to be there in order to setup the nextPost.
+     * Once we get through the list one time, the mutation observer no longer sees any changes, since the posts are part
+     * of the DOM. So, after the first time through all feeds don't use the mutation observer.
+     * @param postElements
+     */
+    reinitializePostValues(postElements) {
+        if (!this.reload) {
+            this.previousPost = null
+            this.currentPost = null
+            this.nextPost = postElements.children[0].children[0]
+        }
+        this.waitForPosts(postElements).then(
+            (element) => {
+                this.previousPost = null
+                this.currentPost = null
+                this.nextPost = postElements.children[0].children[0]
+            })
+
     }
 
     toggleCurrentPostHighlight() {
@@ -156,11 +174,26 @@ export class Feed {
         if (this.currentPost) this.currentPost.style.border = "2px solid blue"
     }
 
-    debugPostStatus() {
-        console.log({
-            previousPost: this.previousPost,
-            currentPost: this.currentPost,
-            nextPost: this.nextPost,
+    waitForPosts(element, reload) {
+        return new Promise((resolve) => {
+            const observer = new MutationObserver((mutations) => {
+                let count = 0
+                for (const mutations of mutations) {
+                    count++
+                    if (count > 12) {
+                        observer.disconnect()
+                        resolve(true)
+                    }
+                }
+            })
+
+            let config = {
+                characterData: true,
+                childList: true,
+                subtree: true
+            }
+
+            observer.observe(element, config)
         })
     }
 }
