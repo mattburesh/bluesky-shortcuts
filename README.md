@@ -18,16 +18,16 @@ A Firefox extension for adding shortcuts to bsky.app.
 
 ## Shortcuts 
 
-| Key | Action | Status|
-|-----|--------|-------|
-| J   | Move Down | Complete |
-| K   | Move Up | Complete |
-| L   | Like Post | Complete |
-| R   | Reply  | Complete |
+| Key | Action | Status      |
+|-----|--------|-------------|
+| J   | Move Down | Complete    |
+| K   | Move Up | Complete    |
+| L   | Like Post | Complete    |
+| R   | Reply  | Complete    |
 | T   | Repost / Quote | In Progress |
-| N   | New Post | In Progress |
-| Enter | Open Post | Broken[^1] |
+| N   | New Post | Complete    |
+| Enter | Open Post | Broken[^1]  |
 | ?   | Show Shortcuts | In Progress |
-| C   | Cycle Saved Feeds | Complete |
+| C   | Cycle Saved Feeds | Complete    |
 
 [^1]: https://github.com/mattburesh/bsky-shortcuts/issues/1
