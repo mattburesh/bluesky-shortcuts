@@ -77,14 +77,14 @@ export class Feed {
 
     likeToggleCurrentPost() {
         let like =
-            this.currentPost.querySelector('[aria-label*="Like ("') ??
-            this.currentPost.querySelector('[aria-label*="Unlike ("')
+            this.currentPost.querySelector('[aria-label*="Like ("]') ??
+            this.currentPost.querySelector('[aria-label*="Unlike ("]')
         like.click()
     }
 
     loadNewPosts() {
         let loadPostsButton =
-            document.querySelector('[aria-label*="Load new posts"') ?? null
+            document.querySelector('[aria-label*="Load new posts"]') ?? null
         if (loadPostsButton) loadPostsButton.click()
     }
 
@@ -140,7 +140,7 @@ export class Feed {
     quoteCurrentPost() {}
 
     replyToCurrentPost() {
-        let reply = this.currentPost.querySelector('[aria-label*="Reply ("')
+        let reply = this.currentPost.querySelector('[aria-label*="Reply ("]')
         reply.click()
     }
 
