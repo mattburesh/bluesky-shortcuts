@@ -1,4 +1,5 @@
 import { Feed } from "./feed.js"
+import { newPost } from "./actions";
 
 console.log("bsky shortcuts running...")
 
@@ -32,7 +33,7 @@ addEventListener("keydown", (event) => {
     if (event.code === "KeyR") postFeed.replyToCurrentPost()
     if (event.code === "KeyC") postFeed.cycleFeeds()
     // if (event.code === 'KeyT') // repost / quote repost
-    // if (event.code === 'KeyN') // new post
+    if (event.code === 'KeyN') newPost()
     // if (event.code === 'Slash') // show shortcuts
     if (event.code === "Enter") postFeed.openCurrentPost()
     if (event.code === "Period") postFeed.loadNewPosts()
