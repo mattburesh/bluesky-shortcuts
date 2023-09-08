@@ -1,7 +1,7 @@
 import { waitForElement } from "./util"
 
 export function newPost() {
-    const newPostButton = document.querySelector('[aria-label*="Compose post"]')
+    const newPostButton = document.querySelector('[aria-label*="New post"]')
     if (newPostButton) newPostButton.click()
 }
 
