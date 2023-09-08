@@ -39,6 +39,7 @@ A Firefox extension for adding shortcuts to bsky.app.
 | T   | Repost / Quote | In Progress |
 | N   | New Post | Complete    |
 | Enter | Open Post | Broken[^1]  |
+| /   | Focus Search | Complete |
 | ?   | Show Shortcuts | In Progress |
 | C   | Cycle Saved Feeds | Complete    |
 
