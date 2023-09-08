@@ -1,5 +1,6 @@
 import { Feed } from "./feed.js"
 import { newPost, focusSearch } from "./actions"
+import { waitForElement } from "./util"
 
 console.log("bsky shortcuts running...")
 
@@ -38,45 +39,3 @@ addEventListener("keydown", (event) => {
     if (event.code === "Enter") postFeed.openCurrentPost()
     if (event.code === "Period") postFeed.loadNewPosts()
 })
-
-function waitForElement(selector) {
-    return new Promise((resolve) => {
-        if (document.querySelector(selector)) {
-            return resolve(document.querySelector(selector))
-        }
-
-        const observer = new MutationObserver((mutations) => {
-            if (document.querySelector(selector)) {
-                observer.disconnect()
-                resolve(document.querySelector(selector))
-            }
-        })
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-        })
-    })
-}
-
-// unsure if this will be needed in the future
-function querySelectorAllLive(element, selector) {
-    let result = Array.prototype.slice.call(element.querySelectorAll(selector))
-    console.log(result)
-
-    let observer = new MutationObserver((mutations) => {
-        console.log(mutations)
-        mutations.forEach((mutation) => {
-            ;[].forEach.call(mutation.addedNodes, (node) => {
-                if (
-                    node.nodeType === Node.ELEMENT_NODE &&
-                    node.matches(selector)
-                ) {
-                    result.push(node)
-                }
-            })
-        })
-    })
-
-    observer.disconnect()
-}

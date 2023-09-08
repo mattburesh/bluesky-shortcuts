@@ -36,7 +36,7 @@ export class Feed {
     }
 
     cycleFeeds() {
-        console.log('cycle called...')
+        console.log("cycle called...")
         // rebuild the list of feeds
         if (this.currentPost) this.currentPost.style.removeProperty("border")
         this.rebuildFeeds()
@@ -44,7 +44,7 @@ export class Feed {
         // loop through the feeds, and switch to the next one
         for (let i = 0; i < this.feeds.length; i++) {
             // if we're on the last iteration, reset to the beginning
-            if (this.activeFeed === (this.feedListButtons.length - 1)) {
+            if (this.activeFeed === this.feedListButtons.length - 1) {
                 this.activeFeed = 0
                 this.feedListButtons[0].click()
                 this.reload = false
@@ -52,7 +52,7 @@ export class Feed {
             }
 
             // otherwise, increment the active feed and click the corresponding button
-            if (i === (this.activeFeed + 1)) {
+            if (i === this.activeFeed + 1) {
                 this.activeFeed++
                 this.feedListButtons[i].click()
                 break
@@ -132,9 +132,9 @@ export class Feed {
     }
 
     rebuildFeeds() {
-        this.feeds = Array.from(document.querySelectorAll(
-            '[data-testid*="-feed-flatlist"]'
-        ))
+        this.feeds = Array.from(
+            document.querySelectorAll('[data-testid*="-feed-flatlist"]')
+        )
     }
 
     quoteCurrentPost() {}
@@ -160,13 +160,11 @@ export class Feed {
             this.currentPost = null
             this.nextPost = postElements.children[0].children[0]
         }
-        this.waitForPosts(postElements).then(
-            (element) => {
-                this.previousPost = null
-                this.currentPost = null
-                this.nextPost = postElements.children[0].children[0]
-            })
-
+        this.waitForPosts(postElements).then((element) => {
+            this.previousPost = null
+            this.currentPost = null
+            this.nextPost = postElements.children[0].children[0]
+        })
     }
 
     toggleCurrentPostHighlight() {
@@ -191,7 +189,7 @@ export class Feed {
             let config = {
                 characterData: true,
                 childList: true,
-                subtree: true
+                subtree: true,
             }
 
             observer.observe(element, config)
