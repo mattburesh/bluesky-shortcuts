@@ -63,15 +63,21 @@ export class Feed {
     }
 
     getPinnedFeeds() {
-        let feeds = document.querySelector(
-            '[data-testid="homeScreenFeedTabs"] > div > div'
-        ).children
+        try {
+            let feeds = document.querySelector(
+                '[data-testid="homeScreenFeedTabs"] > div > div'
+            ).children
+        } catch (e) {
+            console.log("error: " + e)
+        }
 
-        for (let item of feeds) {
-            if (item.style.borderBottomColor === "rgb(0, 133, 255)") {
-                item.activetab = true
+        if (typeof feeds !== "undefined") {
+            for (let item of feeds) {
+                if (item.style.borderBottomColor === "rgb(0, 133, 255)") {
+                    item.activetab = true
+                }
+                this.feedListButtons.push(item)
             }
-            this.feedListButtons.push(item)
         }
     }
 
