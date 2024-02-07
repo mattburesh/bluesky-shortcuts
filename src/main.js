@@ -11,7 +11,6 @@ let postFeed = null
 waitForElement(
     'div[data-testid="followingFeedPage-feed-flatlist"] > div:nth-child(2)'
 ).then((element) => {
-    console.log(["element", element])
     postFeed = new Feed(element)
     ready = true
 })
