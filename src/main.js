@@ -8,12 +8,13 @@ let ready = false
 let postFeed = null
 
 // wait for the feed to load
-waitForElement('div[data-testid="followingFeedPage-feed-flatlist"] > div').then(
-    (element) => {
-        postFeed = new Feed(element)
-        ready = true
-    }
-)
+waitForElement(
+    'div[data-testid="followingFeedPage-feed-flatlist"] > div:nth-child(2)'
+).then((element) => {
+    console.log(["element", element])
+    postFeed = new Feed(element)
+    ready = true
+})
 
 addEventListener("keydown", (event) => {
     // ignore shortcuts if the feed hasn't loaded yet
