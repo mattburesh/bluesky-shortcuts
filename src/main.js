@@ -9,7 +9,7 @@ let postFeed = null
 
 // wait for the feed to load
 waitForElement(
-    'div[data-testid="followingFeedPage-feed-flatlist"] > div:nth-child(2)'
+    'div[data-testid="followingFeedPage-feed-flatlist"]'
 ).then((element) => {
     postFeed = new Feed(element)
     ready = true

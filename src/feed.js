@@ -1,38 +1,24 @@
+import { waitForElement } from "./util"
+
 export class Feed {
-    activeFeed
+    activeFeed = 0
     feeds
-    previousPost
-    currentPost
-    nextPost
+
+    previousPost = null
+    currentPost = null
+    nextPost = null
+
+    isPostOpen = false
+    previousReply = null
+    currentReply = null
+    nextReply = null
+
     feedListButtons = []
     reload = true
 
     constructor(postElements) {
         this.getPinnedFeeds()
         this.rebuildFeeds()
-        this.activeFeed = 0
-        this.nextPost = postElements.children[0]
-    }
-
-    get previousPost() {
-        return this.previousPost
-    }
-    set previousPost(post) {
-        this.previousPost = post
-    }
-
-    get currentPost() {
-        return this.currentPost
-    }
-    set currentPost(post) {
-        this.currentPost = post
-    }
-
-    get nextPost() {
-        return this.nextPost
-    }
-    set nextPost(post) {
-        this.nextPost = post
     }
 
     cycleFeeds() {
@@ -40,6 +26,9 @@ export class Feed {
         // rebuild the list of feeds
         if (this.currentPost) this.currentPost.style.removeProperty("border")
         this.rebuildFeeds()
+        this.currentPost = null
+        this.nextPost = null
+        this.previousPost = null
 
         // loop through the feeds, and switch to the next one
         for (let i = 0; i < this.feeds.length; i++) {
@@ -63,20 +52,23 @@ export class Feed {
     }
 
     getPinnedFeeds() {
+        let feeds = []
         try {
-            let feeds = document.querySelector(
+            feeds = document.querySelector(
                 '[data-testid="homeScreenFeedTabs"] > div > div'
             ).children
         } catch (e) {
-            console.log("error: " + e)
+            console.log("getPinnedFeeds error: " + e)
         }
-
         if (typeof feeds !== "undefined") {
+            let feedId = 0;
             for (let item of feeds) {
-                if (item.style.borderBottomColor === "rgb(0, 133, 255)") {
+                if (item.firstChild.style.getPropertyValue('border-bottom-color')) {
                     item.activetab = true
-                }
+                    this.activeFeed = feedId
+                } 
                 this.feedListButtons.push(item)
+                feedId++
             }
         }
     }
@@ -95,7 +87,22 @@ export class Feed {
     }
 
     moveToNextPost() {
-        this.currentPost = this.nextPost
+        if (this.currentPost !== null) {
+            this.currentPost = this.currentPost.nextSibling
+        } else {
+            let posts = [...document.querySelectorAll('div[data-testid*="feedItem-by-"]')]
+            posts = posts.filter((el) => {
+                if (el.offsetParent !== null) {
+                    return true
+                }
+
+                return false
+            })
+
+            console.log(posts)
+            this.currentPost = posts[0].parentElement.parentElement
+        }
+        
         this.previousPost = this.currentPost.previousSibling ?? this.currentPost
         this.nextPost = this.currentPost.nextSibling
         this.toggleCurrentPostHighlight()
