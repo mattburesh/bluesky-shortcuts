@@ -36,7 +36,6 @@ class BlueSkyShortcuts {
                 isActive: tab.firstChild.style.getPropertyValue('border-bottom-color') ? true : false
             }));
 
-            // Set initial active feed index
             this.currentFeedIndex = this.feedTabs.findIndex(tab => tab.isActive);
         } catch (error) {
             this.logger.error('Failed to initialize feed tabs', error);
@@ -52,7 +51,6 @@ class BlueSkyShortcuts {
             [config.shortcuts.cycleFeed]: this.cycleFeed.bind(this),
             // [config.shortcuts.newPost]: this.newPost,
             [config.shortcuts.openPost]: this.openPost.bind(this),
-            // ... other shortcuts
         };
 
         new KeyboardShortcutManager(config, actionMap);
@@ -62,16 +60,13 @@ class BlueSkyShortcuts {
         const visiblePosts = DOMUtils.findVisiblePosts();
         
         if (!this.currentPost) {
-            // If no current post, select first visible post
             this.currentPost = visiblePosts[0];
         } else {
-            // Find current post's index and move to next
             const currentIndex = visiblePosts.indexOf(this.currentPost);
             const nextIndex = Math.min(currentIndex + 1, visiblePosts.length - 1);
             this.currentPost = visiblePosts[nextIndex];
         }
 
-        // Scroll and highlight
         DOMUtils.safelyScrollIntoView(this.currentPost);
     }
 
@@ -79,16 +74,13 @@ class BlueSkyShortcuts {
         const visiblePosts = DOMUtils.findVisiblePosts();
         
         if (!this.currentPost) {
-            // If no current post, select last visible post
             this.currentPost = visiblePosts[visiblePosts.length - 1];
         } else {
-            // Find current post's index and move to previous
             const currentIndex = visiblePosts.indexOf(this.currentPost);
             const previousIndex = Math.max(currentIndex - 1, 0);
             this.currentPost = visiblePosts[previousIndex];
         }
 
-        // Scroll and highlight
         DOMUtils.safelyScrollIntoView(this.currentPost);
     }
 
@@ -116,7 +108,6 @@ class BlueSkyShortcuts {
         
         DOMUtils.waitForElement(feedSelector)
             .then(feed => {
-                // Prepare first post in new feed
                 const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
                 this.currentPost = firstPost;
             })
@@ -126,7 +117,7 @@ class BlueSkyShortcuts {
     }
 
     newPost() {}
-    
+
     openPost() {
         const postLinks = [...this.currentPost.querySelectorAll('a[role="link"]')];
     

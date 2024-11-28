@@ -2,7 +2,6 @@ export default class KeyboardShortcutManager {
     constructor(config, actionMap) {
         this.config = config;
         this.actionMap = actionMap;
-        console.log('setup listeners')
         this.setupListeners();
     }
 
@@ -12,7 +11,6 @@ export default class KeyboardShortcutManager {
     }
 
     handleKeyEvent(event) {
-        // Comprehensive shortcut prevention
         if (this.shouldPreventShortcut(event)) return;
 
         const action = this.getActionForKey(event.code);
