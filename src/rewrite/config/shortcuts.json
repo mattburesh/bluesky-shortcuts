@@ -6,7 +6,8 @@
         "replyToPost": "KeyR",
         "cycleFeed": "KeyC",
         "newPost": "KeyN",
-        "openPost": "Enter"
+        "openPost": "Enter",
+        "focusSearch": "Slash"
     },
     "behaviors": {
         "scrollBehavior": "smooth",

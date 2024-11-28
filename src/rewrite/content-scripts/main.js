@@ -51,6 +51,7 @@ class BlueSkyShortcuts {
             [config.shortcuts.cycleFeed]: this.cycleFeed.bind(this),
             // [config.shortcuts.newPost]: this.newPost,
             [config.shortcuts.openPost]: this.openPost.bind(this),
+            [config.shortcuts.focusSearch]: this.focusSearch.bind(this),
         };
 
         new KeyboardShortcutManager(config, actionMap);
@@ -129,6 +130,29 @@ class BlueSkyShortcuts {
             postLink.click();
         } else {
             this.logger.warn('No valid post link found');
+        }
+    }
+
+    focusSearch() {
+        const searchInput = document.querySelector('input[aria-label="Search"]');
+        if (searchInput) {
+            searchInput.focus();
+            searchInput.select(); // Optional: select all text for easy replacement
+            return;
+        }
+    
+        const searchAnchor = document.querySelector('a[aria-label="Search"]');
+        if (searchAnchor) {
+            searchAnchor.click();
+            
+            DOMUtils.waitForElement('input[aria-label="Search"]')
+                .then(element => {
+                    element.focus();
+                    element.select();
+                })
+                .catch(error => {
+                    this.logger.error('Failed to find search input', error);
+                });
         }
     }
 }
