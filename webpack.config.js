@@ -7,10 +7,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 const isProduction = process.env.NODE_ENV == 'production'
 let buildPath = isProduction ? 'dist/' : 'build/'
 
-const stylesHandler = 'style-loader'
-
 const config = {
-    entry: './src/main.js',
+    entry: './src/content-scripts/main.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
     },
@@ -31,7 +29,7 @@ const config = {
             },
             {
                 test: /\.css$/i,
-                use: [stylesHandler,'css-loader'],
+                use: ['style-loader','css-loader'],
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,

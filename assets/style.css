@@ -1,0 +1,4 @@
+.bsky-highlighted-post {
+    border: 2px solid #0070FF;
+    transition: border 0.2s ease;
+}

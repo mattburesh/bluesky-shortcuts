@@ -1,0 +1,18 @@
+{
+    "shortcuts": {
+        "nextPost": "KeyJ",
+        "previousPost": "KeyK",
+        "likePost": "KeyL",
+        "replyToPost": "KeyR",
+        "cycleFeed": "KeyC",
+        "newPost": "KeyN",
+        "expandPhoto": "KeyO",
+        "openPost": "Enter",
+        "focusSearch": "Slash"
+    },
+    "behaviors": {
+        "scrollBehavior": "smooth",
+        "highlightColor": "#0070FF",
+        "debugMode": false
+    }
+}
