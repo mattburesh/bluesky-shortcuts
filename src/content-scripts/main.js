@@ -183,6 +183,7 @@ class BlueSkyShortcuts {
         const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
 
         if (loadPostsButton) {
+            loadPostsButton.click();
             this.currentPost = null;
             this.moveToNextPost();
         }
