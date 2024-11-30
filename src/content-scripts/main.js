@@ -53,6 +53,7 @@ class BlueSkyShortcuts {
             [config.shortcuts.openPost]: this.openPost.bind(this),
             [config.shortcuts.focusSearch]: this.focusSearch.bind(this),
             [config.shortcuts.expandPhoto]: this.expandPhoto.bind(this),
+            [config.shortcuts.loadMore]: this.loadMore.bind(this),
         };
 
         new KeyboardShortcutManager(config, actionMap);
@@ -175,6 +176,15 @@ class BlueSkyShortcuts {
                 .catch(error => {
                     this.logger.error('Failed to find search input', error);
                 });
+        }
+    }
+
+    loadMore() {
+        const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
+
+        if (loadPostsButton) {
+            this.currentPost = null;
+            this.moveToNextPost();
         }
     }
 }
