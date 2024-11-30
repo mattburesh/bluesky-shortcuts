@@ -6,6 +6,7 @@
         "replyToPost": "KeyR",
         "cycleFeed": "KeyC",
         "newPost": "KeyN",
+        "expandPhoto": "KeyO",
         "openPost": "Enter",
         "focusSearch": "Slash"
     },

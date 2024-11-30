@@ -52,6 +52,7 @@ class BlueSkyShortcuts {
             // [config.shortcuts.newPost]: this.newPost,
             [config.shortcuts.openPost]: this.openPost.bind(this),
             [config.shortcuts.focusSearch]: this.focusSearch.bind(this),
+            [config.shortcuts.expandPhoto]: this.expandPhoto.bind(this),
         };
 
         new KeyboardShortcutManager(config, actionMap);
@@ -130,6 +131,16 @@ class BlueSkyShortcuts {
             postLink.click();
         } else {
             this.logger.warn('No valid post link found');
+        }
+    }
+
+    expandPhoto() {
+        const photoLink = this.currentPost.querySelector('img[src*="feed_thumbnail"]:not(a img)');
+
+        if (photoLink) {
+            photoLink.click();
+        } else {
+            this.logger.warn('No valid photo link found');
         }
     }
 
