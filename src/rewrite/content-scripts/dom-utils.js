@@ -19,9 +19,18 @@ export default class DOMUtils {
         });
     }
 
+    /**
+     * Todo: Add search results feed
+     */
     static findVisiblePosts() {
-        return [...document.querySelectorAll('div[data-testid*="feedItem-by-"]')]
-            .filter(el => el.offsetParent !== null);
+        const feedItems = [
+            // Main feed items
+            ...document.querySelectorAll('div[data-testid*="feedItem-by-"]'),
+            // Thread/reply items
+            ...document.querySelectorAll('div[data-testid*="postThreadItem-by-"]')
+        ].filter(el => el.offsetParent !== null);
+
+        return feedItems;
     }
 
     static safelyScrollIntoView(element, options = {}) {

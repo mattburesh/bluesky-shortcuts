@@ -60,6 +60,11 @@ class BlueSkyShortcuts {
 
     moveToNextPost() {
         const visiblePosts = DOMUtils.findVisiblePosts();
+
+        if (!visiblePosts.length) {
+            this.logger.warn('No visible posts found');
+            return;
+        }
         
         if (!this.currentPost) {
             this.currentPost = visiblePosts[0];
@@ -74,6 +79,11 @@ class BlueSkyShortcuts {
 
     moveToPreviousPost() {
         const visiblePosts = DOMUtils.findVisiblePosts();
+
+        if (!visiblePosts.length) {
+            this.logger.warn('No visible posts found');
+            return;
+        }
         
         if (!this.currentPost) {
             this.currentPost = visiblePosts[visiblePosts.length - 1];
@@ -118,6 +128,7 @@ class BlueSkyShortcuts {
             });
     }
 
+    // don't know if this needs to exist, believe the shortcut exists on bsky.app
     newPost() {}
 
     openPost() {
