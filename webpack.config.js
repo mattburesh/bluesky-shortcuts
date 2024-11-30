@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV == 'production'
 let buildPath = isProduction ? 'dist/' : 'build/'
 
 const config = {
-    entry: './src/rewrite/content-scripts/main.js',
+    entry: './src/content-scripts/main.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
     },

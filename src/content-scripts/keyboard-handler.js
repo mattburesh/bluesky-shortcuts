@@ -6,7 +6,6 @@ export default class KeyboardShortcutManager {
     }
 
     setupListeners() {
-        console.log(this)
         document.addEventListener('keydown', this.handleKeyEvent.bind(this));
     }
 

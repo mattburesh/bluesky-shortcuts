@@ -2,7 +2,7 @@ import config from '../config/shortcuts.json';
 import KeyboardShortcutManager from './keyboard-handler';
 import DOMUtils from './dom-utils';
 import Logger from '../utils/logger';
-import * as css from "../assets/style.css";
+import * as css from "../../assets/style.css";
 
 class BlueSkyShortcuts {
     constructor() {
