@@ -3,12 +3,12 @@
     "name": "bsky-shortcuts",
     "author": "Matt Buresh",
     "homepage_url": "https://github.com/mattburesh/bsky-shortcuts",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Adds keyboard shortcuts to bsky.app",
     "icons": {},
     "content_scripts": [
         {
-            "matches": ["https://*.bsky.app/*"],
+            "matches": ["https://bsky.app/*"],
             "js": ["main.js"]
         }
     ]
