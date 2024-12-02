@@ -23,6 +23,7 @@ export default class KeyboardShortcutManager {
         const isInputFocused = 
             document.activeElement.tagName === 'INPUT' ||
             document.activeElement.tagName === 'TEXTAREA' ||
+            document.activeElement.role === 'textbox' ||
             event.ctrlKey || 
             event.altKey || 
             event.shiftKey || 
