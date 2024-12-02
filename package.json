@@ -1,6 +1,6 @@
 {
     "name": "bsky-shortcuts",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Adds keyboard shortcuts to bsky.app",
     "scripts": {
         "build": "webpack --mode=production --node-env=production --no-devtool",
