@@ -4,8 +4,8 @@
     "description": "Adds keyboard shortcuts to bsky.app",
     "scripts": {
         "build": "npm run build:chrome:prod && npm run build:firefox:prod",
-        "build:chrome": "webpack --env browser=chrome",
-        "build:chrome:prod": "webpack --env browser=chrome --env production",
+        "build:chrome": "webpack --env browser=chrome --no-devtool",
+        "build:chrome:prod": "webpack --env browser=chrome --env production --no-devtool",
         "build:firefox": "webpack --env browser=firefox",
         "build:firefox:prod": "webpack --env browser=firefox --env production",
         "build:dev": "webpack --mode=development --no-dev-tool",
