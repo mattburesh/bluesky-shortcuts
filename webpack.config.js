@@ -1,6 +1,7 @@
 const path = require('path')
 const CopyPlugin = require("copy-webpack-plugin");
 const ZipPlugin = require('zip-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 function generateManifest(browser) {
     const baseManifest = require('./src/manifest.json');
@@ -30,6 +31,14 @@ module.exports = (env) => {
             filename: 'main.js',
         },
         mode: isProduction ? 'production' : 'development',
+        optimization: {
+            minimize: isProduction,
+            minimizer: [
+                new TerserPlugin({
+                    extractComments: false,
+                }),
+            ]
+        },
         plugins: [
             new CopyPlugin({
                 patterns: [
@@ -40,11 +49,7 @@ module.exports = (env) => {
                             return JSON.stringify(manifest, null, 2);
                         }
                     },
-                    {
-                        from: "LICENSE",
-                        to: "LICENSE",
-                        toType: 'file'
-                    }
+                    { from: "LICENSE" }
                 ]
             })
         ],
