@@ -1,65 +1,78 @@
-const { verify } = require('crypto')
-const { VERSION } = require('ejs')
-const { version } = require('os')
 const path = require('path')
 const CopyPlugin = require("copy-webpack-plugin");
+const ZipPlugin = require('zip-webpack-plugin');
 
-const isProduction = process.env.NODE_ENV == 'production'
-let buildPath = isProduction ? 'dist/' : 'build/'
+function generateManifest(browser) {
+    const baseManifest = require('./src/manifest.json');
 
-const config = {
-    entry: './src/content-scripts/main.js',
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-    },
-    plugins: [
-        // Add your plugins here
-        // Learn more about plugins from https://webpack.js.org/configuration/plugins/
-        new CopyPlugin({
-            patterns: [
-                { from: "src/manifest.json" }
-            ]
-        })
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.(js|jsx)$/i,
-                loader: 'babel-loader',
-            },
-            {
-                test: /\.css$/i,
-                use: ['style-loader','css-loader'],
-            },
-            {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-                type: 'asset',
-            },
-
-            // Add your rules for custom modules here
-            // Learn more about loaders from https://webpack.js.org/loaders/
-        ],
-    },
-};
-
-module.exports = () => {
-    if (isProduction) {
-        config.mode = 'production'
-        config.output = {
-            filename: 'main.js',
-            path: path.resolve(__dirname, 'dist')
+    if (browser === 'firefox') {
+        return {
+            ...baseManifest,
+            manifest_version: 2,
         }
-        
     } else {
-        config.mode = 'development'
-        config.output = {
+        return {
+            ...baseManifest,
+            manifest_version: 3,
+        }
+    }
+}
+
+module.exports = (env) => {
+    const browser = env.browser || 'chrome';
+    const isProduction = env.production === true;
+    const outputDir = isProduction ? `dist/${browser}` : `build/${browser}`;
+
+    const config = {
+        entry: './src/content-scripts/main.js',
+        output: {
+            path: path.resolve(__dirname, outputDir),
             filename: 'main.js',
-            path: path.resolve(__dirname, 'build')
+        },
+        mode: isProduction ? 'production' : 'development',
+        plugins: [
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: "src/manifest.json",
+                        transform: (content) => {
+                            const manifest = generateManifest(browser);
+                            return JSON.stringify(manifest, null, 2);
+                        }
+                    },
+                    {
+                        from: "LICENSE",
+                        to: "LICENSE",
+                        toType: 'file'
+                    }
+                ]
+            })
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.(js|jsx)$/i,
+                    loader: 'babel-loader',
+                },
+                {
+                    test: /\.css$/i,
+                    use: ['style-loader','css-loader'],
+                },
+                {
+                    test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+                    type: 'asset',
+                },
+            ],
         }
-        config.watch = true
-        config.watchOptions = {
-            ignored: '**/node_modules'
-        }
+    }
+
+    if (isProduction) {
+        config.plugins.push(
+            new ZipPlugin({
+                path: '../',
+                filename: `bsky-shortcuts-${browser}-${require('./package.json').version}.zip`
+            })
+        );
     }
 
     return config;

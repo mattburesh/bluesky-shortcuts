@@ -3,11 +3,16 @@
     "version": "1.0.3",
     "description": "Adds keyboard shortcuts to bsky.app",
     "scripts": {
-        "build": "webpack --mode=production --node-env=production --no-devtool",
+        "build": "npm run build:chrome:prod && npm run build:firefox:prod",
+        "build:chrome": "webpack --env browser=chrome",
+        "build:chrome:prod": "webpack --env browser=chrome --env production",
+        "build:firefox": "webpack --env browser=firefox",
+        "build:firefox:prod": "webpack --env browser=firefox --env production",
         "build:dev": "webpack --mode=development --no-dev-tool",
         "build:prod": "webpack --mode=production --node-env=production --no-devtool",
         "bump": "node bin/bump-version.js",
-        "watch": "webpack --watch"
+        "watch": "webpack --watch",
+        "clean": "rimraf build dist"
     },
     "devDependencies": {
         "@babel/core": "^7.22.11",
@@ -17,8 +22,13 @@
         "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.11.0",
         "prettier": "^3.0.3",
+        "rimraf": "^6.0.1",
         "style-loader": "^3.3.4",
         "webpack": "^5.88.2",
-        "webpack-cli": "^5.1.4"
+        "webpack-cli": "^5.1.4",
+        "zip-webpack-plugin": "^4.0.2"
+    },
+    "overrides": {
+        "glob": "^9.0.0"
     }
 }
