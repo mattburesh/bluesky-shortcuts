@@ -1,9 +1,14 @@
 export default class DOMUtils {
-    static waitForElement(selector, timeout = 5000) {
+    static waitForElement(selector, timeout = 5000, signal) {
         return new Promise((resolve, reject) => {
             const startTime = Date.now();
 
             const checkForElement = () => {
+                if (signal?.aborted) {
+                    reject('cancelled');
+                    return;
+                }
+
                 const element = document.querySelector(selector);
                 
                 if (element) {

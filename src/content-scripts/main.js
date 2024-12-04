@@ -8,7 +8,8 @@ class BlueSkyShortcuts {
     constructor() {
         this.currentFeedIndex = 0;
         this.feedTabs = [];
-        this.currentPost = null
+        this.currentPost = null;
+        this.currentController = null;
 
         this.logger = new Logger();
         this.initializeExtension();
@@ -44,19 +45,37 @@ class BlueSkyShortcuts {
 
     setupShortcuts() {
         const actionMap = {
-            [config.shortcuts.nextPost]: this.moveToNextPost.bind(this),
-            [config.shortcuts.previousPost]: this.moveToPreviousPost.bind(this),
-            [config.shortcuts.likePost]: this.likePost.bind(this),
-            [config.shortcuts.replyToPost]: this.replyToPost.bind(this),
-            [config.shortcuts.cycleFeed]: this.cycleFeed.bind(this),
-            // [config.shortcuts.newPost]: this.newPost,
-            [config.shortcuts.openPost]: this.openPost.bind(this),
-            [config.shortcuts.focusSearch]: this.focusSearch.bind(this),
-            [config.shortcuts.expandPhoto]: this.expandPhoto.bind(this),
-            [config.shortcuts.loadMore]: this.loadMore.bind(this),
+            [config.shortcuts.nextPost]: {
+                action: this.moveToNextPost.bind(this)
+            },
+            [config.shortcuts.previousPost]: {
+                action: this.moveToPreviousPost.bind(this)
+            },
+            [config.shortcuts.likePost]: {
+                action: this.likePost.bind(this)
+            },
+            [config.shortcuts.replyToPost]: {
+                action: this.replyToPost.bind(this)
+            },
+            [config.shortcuts.cycleFeed]: {
+                action: this.cycleFeed.bind(this),
+                allowedModifiers: ['shift']
+            },
+            [config.shortcuts.openPost]: {
+                action: this.openPost.bind(this)
+            },
+            [config.shortcuts.focusSearch]: {
+                action: this.focusSearch.bind(this)
+            },
+            [config.shortcuts.expandPhoto]: {
+                action: this.expandPhoto.bind(this)
+            },
+            [config.shortcuts.loadMore]: {
+                action: this.loadMore.bind(this)
+            }
         };
 
-        new KeyboardShortcutManager(config, actionMap);
+        new KeyboardShortcutManager(actionMap);
     }
 
     moveToNextPost() {
@@ -109,8 +128,13 @@ class BlueSkyShortcuts {
         reply.click()
     }
 
-    cycleFeed() {
-        this.currentFeedIndex = (this.currentFeedIndex + 1) % this.feedTabs.length;
+    cycleFeed(event) {
+        if (this.currentController) {
+            this.currentController.abort();
+        }
+
+        const direction = event.shiftKey ? -1 : 1;
+        this.currentFeedIndex = (this.currentFeedIndex + direction + this.feedTabs.length) % this.feedTabs.length;
         this.feedTabs[this.currentFeedIndex].element.click();
         this.currentPost = null;
         this.waitForFeedLoad();
@@ -119,13 +143,17 @@ class BlueSkyShortcuts {
     waitForFeedLoad() {
         const feedSelector = `[data-testid*="-feed-flatlist"]:nth-child(${this.currentFeedIndex + 1})`;
         
-        DOMUtils.waitForElement(feedSelector)
+        this.currentController = new AbortController();
+
+        DOMUtils.waitForElement(feedSelector, 5000, this.currentController.signal)
             .then(feed => {
                 const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
                 this.currentPost = firstPost;
             })
             .catch(error => {
-                this.logger.error('Failed to load feed', error);
+                if (error !== 'cancelled') {
+                    this.logger.error('Failed to load feed', error);
+                }
             });
     }
 

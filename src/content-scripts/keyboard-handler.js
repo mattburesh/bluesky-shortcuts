@@ -1,6 +1,5 @@
 export default class KeyboardShortcutManager {
-    constructor(config, actionMap) {
-        this.config = config;
+    constructor(actionMap) {
         this.actionMap = actionMap;
         this.setupListeners();
     }
@@ -10,26 +9,26 @@ export default class KeyboardShortcutManager {
     }
 
     handleKeyEvent(event) {
-        if (this.shouldPreventShortcut(event)) return;
+        const mapping = this.actionMap[event.code];
+        if (!mapping) return;
 
-        const action = this.getActionForKey(event.code);
-        if (action) {
-            event.preventDefault();
-            action();
-        }
+        if (this.shouldPreventShortcut(event, mapping.allowedModifiers)) return;
+
+        event.preventDefault();
+        mapping.action(event);
     }
 
-    shouldPreventShortcut(event) {
-        const isInputFocused = 
+    shouldPreventShortcut(event, allowedModifiers = []) {
+        const shouldPrevent = 
             document.activeElement.tagName === 'INPUT' ||
             document.activeElement.tagName === 'TEXTAREA' ||
             document.activeElement.role === 'textbox' ||
-            event.ctrlKey || 
-            event.altKey || 
-            event.shiftKey || 
-            event.metaKey;
+            (event.ctrlKey && !allowedModifiers.includes('ctrl')) || 
+            (event.altKey && !allowedModifiers.includes('alt')) || 
+            (event.shiftKey && !allowedModifiers.includes('shift')) ||
+            (event.metaKey && !allowedModifiers.includes('meta'));
 
-        return isInputFocused;
+        return shouldPrevent;
     }
 
     getActionForKey(keyCode) {
