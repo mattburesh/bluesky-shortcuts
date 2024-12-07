@@ -42,9 +42,16 @@ export default class DOMUtils {
         if (element) {
             document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
                 el.classList.remove('bsky-highlighted-post');
+                el.removeAttribute('aria-current');
+                el.removeAttribute('aria-label');
             });
 
             element.classList.add('bsky-highlighted-post');
+            element.setAttribute('aria-current', 'true');
+            element.setAttribute('aria-label', 'Currently selected post');
+            
+            element.setAttribute('tabIndex', '-1');
+            element.focus();
 
             element.scrollIntoView({
                 behavior: 'smooth',
