@@ -1,4 +1,8 @@
+import AccessibilityUtils from "./aria-utils";
+
 export default class DOMUtils {
+    static accessibilityUtils = new AccessibilityUtils();
+
     static waitForElement(selector, timeout = 5000, signal) {
         return new Promise((resolve, reject) => {
             const startTime = Date.now();
@@ -35,6 +39,14 @@ export default class DOMUtils {
             ...document.querySelectorAll('div[data-testid*="postThreadItem-by-"]')
         ].filter(el => el.offsetParent !== null);
 
+        feedItems.forEach(post => {
+            if (!post.hasAttribute('role')) {
+                post.setAttribute('role', 'article');
+                post.setAttribute('tabindex', '0');
+                this.accessibilityUtils.addPostLabels(post);
+            }
+        })
+
         return feedItems;
     }
 
@@ -48,10 +60,12 @@ export default class DOMUtils {
 
             element.classList.add('bsky-highlighted-post');
             element.setAttribute('aria-current', 'true');
-            element.setAttribute('aria-label', 'Currently selected post');
+            // element.setAttribute('aria-label', 'Currently selected post');
             
-            element.setAttribute('tabIndex', '-1');
-            element.focus();
+            // element.setAttribute('tabIndex', '-1');
+            // element.focus();
+
+            this.accessibilityUtils.announcePostDetails(element);
 
             element.scrollIntoView({
                 behavior: 'smooth',

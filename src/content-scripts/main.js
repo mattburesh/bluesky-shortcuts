@@ -1,7 +1,6 @@
 import config from '../config/shortcuts.json';
 import KeyboardShortcutManager from './keyboard-handler';
-import DOMUtils from './dom-utils';
-import announcer from './announcer';
+import DOMUtils from '../utils/dom-utils';
 import Logger from '../utils/logger';
 import * as css from "../../assets/style.css";
 
@@ -122,8 +121,6 @@ class BlueSkyShortcuts {
             this.currentPost.querySelector('[aria-label*="Like ("]') ??
             this.currentPost.querySelector('[aria-label*="Unlike ("]')
         like.click()
-
-        announcer.announce(like.getAttribute('aria-label'));
     }
 
     replyToPost() {
@@ -218,17 +215,6 @@ class BlueSkyShortcuts {
             this.currentPost = null;
             this.moveToNextPost();
         }
-    }
-
-    announceAction(message) {
-        console.log("Announcing " + message);
-        const announcement = document.createElement('div');
-        announcement.setAttribute('role', 'status');
-        announcement.setAttribute('aria-live', 'polite');
-        announcement.className = 'sr-only'; // visually hidden
-        announcement.textContent = message;
-        document.body.appendChild(announcement);
-        setTimeout(() => announcement.remove(), 1000);
     }
 }
 
