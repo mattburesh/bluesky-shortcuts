@@ -35,49 +35,65 @@ export default class AccessibilityUtils {
 
         // Check if it's a repost
         const isRepost = postElement.querySelector('[data-testid*="repostBy"]');
+        const repostText = postElement.querySelector('[data-testid*="repostBy"]')?.textContent || '';
         if (isRepost) {
             const reposter = isRepost.textContent;
-            parts.push(`Reposted by ${reposter}`);
+            // parts.push(`Reposted by ${reposter}`);
         }
-
-        // Get author info
-        const author = postElement.querySelector('a[aria-label*="avatar"] span');
-        const handle = postElement.querySelector('span[class*="css"]').textContent;
-        if (author) {
-            parts.push(`Posted by ${author.textContent} ${handle}`);
-        }
-
+        
         // Get timestamp
         const timestamp = postElement.querySelector('a[data-tooltip]');
-        if (timestamp) {
-            parts.push(`${timestamp.getAttribute('data-tooltip')}`);
-        }
+        const timeText = timestamp?.textContent || '';
+        // if (timestamp) {
+        //     parts.push(`${timestamp.getAttribute('data-tooltip')}`);
+        // }
+        
+
+        // Get author info
+        const authorName = postElement.querySelector('div[dir="auto"] a[href^="/profile"] span[style*="font-weight: 600"]');
+        const authorDisplayName = authorName?.textContent.trim() || '';
 
         // Get post content
         const content = postElement.querySelector('[data-testid="postText"]');
-        if (content) {
-            parts.push(`Post content: ${content.textContent}`);
-        }
+        const postText = content?.textContent.trim() || '';
+
+        
+        // const content = postElement.querySelector('[data-testid="postText"]');
+        // if (content) {
+        //     parts.push(`Post content: ${content.textContent}`);
+        // }
 
         // Get engagement stats
-        const replies = postElement.querySelector('[data-testid="replyBtn"]');
-        const likes = postElement.querySelector('[data-testid="likeCount"]');
+        const replies = postElement.querySelector('[data-testid="replyBtn"] div')?.textContent || '0';
+        const reposts = postElement.querySelector('[aria-label*="Repost"] + div')?.textContent || '0';
+        const likes = postElement.querySelector('[data-testid="likeCount"]')?.textContent || '0';
         
-        const stats = [];
-        if (replies) stats.push(`${replies.textContent} replies`);
-        if (likes) stats.push(`${likes.textContent} likes`);
+        // Build engagement string
+        const engagementParts = [];
+        if (replies !== '0') engagementParts.push(`${replies} replies`);
+        if (reposts !== '0') engagementParts.push(`${reposts} reposts`);
+        if (likes !== '0') engagementParts.push(`${likes} likes`);
+
+        const engagementText = engagementParts.length > 0 ? engagementParts.join(', ') : 'No engagement yet';
+
+        // const stats = [];
+        // if (replies) stats.push(`${replies.textContent} replies`);
+        // if (likes) stats.push(`${likes.textContent} likes`);
         
-        if (stats.length > 0) {
-            parts.push(`Engagement: ${stats.join(', ')}`);
-        }
+        // if (stats.length > 0) {
+        //     parts.push(`Engagement: ${stats.join(', ')}`);
+        // }
+
+        // Combine all parts
+        return `${repostText} ${timeText} ${authorDisplayName} posted "${postText}". ${engagementText}`;
 
         // Check for media
-        const hasImage = postElement.querySelector('img[src*="feed_thumbnail"]');
-        if (hasImage) {
-            parts.push('Contains image');
-        }
+        // const hasImage = postElement.querySelector('img[src*="feed_thumbnail"]');
+        // if (hasImage) {
+        //     parts.push('Contains image');
+        // }
 
-        return parts.join('. ');
+        // return parts.join('. ');
     }
 
     announce(message) {
