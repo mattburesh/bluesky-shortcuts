@@ -44,9 +44,7 @@ export default class AccessibilityUtils {
         // Get timestamp
         const timestamp = postElement.querySelector('a[data-tooltip]');
         const timeText = timestamp?.textContent || '';
-        // if (timestamp) {
-        //     parts.push(`${timestamp.getAttribute('data-tooltip')}`);
-        // }
+        const formattedTime = this.formatTimeText(timeText);
         
 
         // Get author info
@@ -85,7 +83,7 @@ export default class AccessibilityUtils {
         // }
 
         // Combine all parts
-        return `${repostText} ${timeText} ${authorDisplayName} posted "${postText}". ${engagementText}`;
+        return `${repostText} ${formattedTime} ${authorDisplayName} posted "${postText}". ${engagementText}`;
 
         // Check for media
         // const hasImage = postElement.querySelector('img[src*="feed_thumbnail"]');
@@ -130,5 +128,25 @@ export default class AccessibilityUtils {
         if (repostButton) {
             repostButton.setAttribute('aria-label', 'Repost or quote this post');
         }
+    }
+
+    formatTimeText(timeText) {
+        timeText = timeText.trim();
+    
+        const timeFormats = {
+            'm': 'minutes',
+            'h': 'hours',
+            'd': 'days',
+            'mo': 'months',
+        };
+
+        // Extract number and unit if the text matches our expected format
+        const match = timeText.match(/^(\d+)(mo|[mhd])$/);
+        if (match) {
+            const [, number, unit] = match;
+            return `${number} ${timeFormats[unit]} ago`;
+        }
+        
+        return timeText;
     }
 }
