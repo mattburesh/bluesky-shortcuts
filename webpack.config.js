@@ -2,6 +2,7 @@ const path = require('path')
 const CopyPlugin = require("copy-webpack-plugin");
 const ZipPlugin = require('zip-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const localConfig = require('./config.local.js');
 
 function generateManifest(browser) {
     const baseManifest = require('./src/manifest.json');
@@ -10,11 +11,24 @@ function generateManifest(browser) {
         return {
             ...baseManifest,
             manifest_version: 2,
+            browser_specific_settings: {
+                gecko: {
+                    id: localConfig.firefoxGuid
+                }
+            },
+            options_ui: {
+                page: "options.html",
+                browser_style: true
+            },
         }
     } else {
         return {
             ...baseManifest,
             manifest_version: 3,
+            options_ui: {
+                page: "options.html",
+                open_in_tab: true
+            }
         }
     }
 }
@@ -25,10 +39,13 @@ module.exports = (env) => {
     const outputDir = isProduction ? `dist/${browser}` : `build/${browser}`;
 
     const config = {
-        entry: './src/content-scripts/main.js',
+        entry: {
+            main: './src/content-scripts/main.js',
+            options: './src/ui/options/options.js'
+        },
         output: {
             path: path.resolve(__dirname, outputDir),
-            filename: 'main.js',
+            filename: '[name].js',
         },
         mode: isProduction ? 'production' : 'development',
         optimization: {
@@ -49,7 +66,8 @@ module.exports = (env) => {
                             return JSON.stringify(manifest, null, 2);
                         }
                     },
-                    { from: "LICENSE" }
+                    { from: "LICENSE" },
+                    { from: "src/ui/options/options.html", to: "options.html" }
                 ]
             })
         ],

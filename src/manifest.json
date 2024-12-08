@@ -5,6 +5,9 @@
     "version": "1.0.5",
     "description": "Adds keyboard shortcuts to bsky.app",
     "icons": {},
+    "permissions": [
+        "storage"
+    ],
     "content_scripts": [
         {
             "matches": ["https://bsky.app/*"],

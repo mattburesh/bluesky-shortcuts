@@ -1,7 +1,16 @@
 import AccessibilityUtils from "./aria-utils";
+import SettingsManager from './settings';
 
 export default class DOMUtils {
+    static settingsManager = new SettingsManager();
     static accessibilityUtils = new AccessibilityUtils();
+
+    static async initializeAccessibility() {
+        const isEnabled = await this.settingsManager.isFeatureEnabled('screenReaderAnnouncements');
+        if (isEnabled) {
+            this.accessibilityUtils = new AccessibilityUtils();
+        }
+    }
 
     static waitForElement(selector, timeout = 5000, signal) {
         return new Promise((resolve, reject) => {
@@ -55,17 +64,21 @@ export default class DOMUtils {
             document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
                 el.classList.remove('bsky-highlighted-post');
                 el.removeAttribute('aria-current');
+                el.removeAttribute('aria-selected');
                 el.removeAttribute('aria-label');
             });
-
             element.classList.add('bsky-highlighted-post');
-            element.setAttribute('aria-current', 'true');
+            
             // element.setAttribute('aria-label', 'Currently selected post');
             
             // element.setAttribute('tabIndex', '-1');
             // element.focus();
 
-            this.accessibilityUtils.announcePostDetails(element);
+            if (this.accessibilityUtils) {
+                element.setAttribute('aria-current', 'true');
+                element.setAttribute('aria-selected', 'true');
+                this.accessibilityUtils.announcePostDetails(element);
+            }
 
             element.scrollIntoView({
                 behavior: 'smooth',

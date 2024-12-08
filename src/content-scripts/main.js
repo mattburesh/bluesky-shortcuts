@@ -1,4 +1,4 @@
-import config from '../config/shortcuts.json';
+import config from '../config/config.json';
 import KeyboardShortcutManager from './keyboard-handler';
 import DOMUtils from '../utils/dom-utils';
 import Logger from '../utils/logger';
@@ -18,6 +18,7 @@ class BlueSkyShortcuts {
     async initializeExtension() {
         try {
             await this.waitForAppLoad();
+            await DOMUtils.initializeAccessibility();
             this.setupShortcuts();
             this.setupFeedTabs();
         } catch (error) {

@@ -15,5 +15,15 @@
         "scrollBehavior": "smooth",
         "highlightColor": "#0070FF",
         "debugMode": false
+    },
+    "experimental": {
+        "enabled": false,
+        "features": {
+            "screenReaderAnnouncements": {
+                "enabled": false,
+                "description": "EXPERIMENTAL: Enhanced screen reader announcements for post navigation.",
+                "warning": "This feature is experimental and may change significantly or be removed in future versions."
+            }
+        }
     }
 }

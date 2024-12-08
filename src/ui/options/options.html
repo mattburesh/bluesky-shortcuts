@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BlueSky Shortcuts Settings</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        .experimental-section {
+            margin-top: 20px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .feature-description {
+            color: #666;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body class="browser-style">
+    <h1>BlueSky Shortcuts Settings</h1>
+    
+    <div class="experimental-section">
+        <h2>Experimental Features</h2>
+        <div class="warning">
+            Warning: Experimental features are in early development and may not work as expected.
+            They might change significantly or be removed in future versions.
+        </div>
+        
+        <label>
+            <input type="checkbox" id="experimental-enabled">
+            Enable experimental features
+        </label>
+        
+        <div id="experimental-features" style="margin-left: 20px; margin-top: 12px;">
+            <label>
+                <input type="checkbox" id="screen-reader-announcements">
+                Enhanced screen reader announcements
+            </label>
+            <p class="feature-description">
+                Provides detailed post announcements when navigating with keyboard shortcuts.
+                Currently in early access and testing.
+            </p>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>
