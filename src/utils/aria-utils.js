@@ -40,12 +40,11 @@ export default class AccessibilityUtils {
             const reposter = isRepost.textContent;
             // parts.push(`Reposted by ${reposter}`);
         }
-        
+
         // Get timestamp
         const timestamp = postElement.querySelector('a[data-tooltip]');
         const timeText = timestamp?.textContent || '';
         const formattedTime = this.formatTimeText(timeText);
-        
 
         // Get author info
         const authorName = postElement.querySelector('div[dir="auto"] a[href^="/profile"] span[style*="font-weight: 600"]');
@@ -55,17 +54,11 @@ export default class AccessibilityUtils {
         const content = postElement.querySelector('[data-testid="postText"]');
         const postText = content?.textContent.trim() || '';
 
-        
-        // const content = postElement.querySelector('[data-testid="postText"]');
-        // if (content) {
-        //     parts.push(`Post content: ${content.textContent}`);
-        // }
-
         // Get engagement stats
         const replies = postElement.querySelector('[data-testid="replyBtn"] div')?.textContent || '0';
-        const reposts = postElement.querySelector('[aria-label*="Repost"] + div')?.textContent || '0';
+        const reposts = postElement.querySelector('[aria-label*="Repost"]')?.textContent || '0';
         const likes = postElement.querySelector('[data-testid="likeCount"]')?.textContent || '0';
-        
+
         // Build engagement string
         const engagementParts = [];
         if (replies !== '0') engagementParts.push(`${replies} replies`);
@@ -73,14 +66,6 @@ export default class AccessibilityUtils {
         if (likes !== '0') engagementParts.push(`${likes} likes`);
 
         const engagementText = engagementParts.length > 0 ? engagementParts.join(', ') : 'No engagement yet';
-
-        // const stats = [];
-        // if (replies) stats.push(`${replies.textContent} replies`);
-        // if (likes) stats.push(`${likes.textContent} likes`);
-        
-        // if (stats.length > 0) {
-        //     parts.push(`Engagement: ${stats.join(', ')}`);
-        // }
 
         // Combine all parts
         return `${repostText} ${formattedTime} ${authorDisplayName} posted "${postText}". ${engagementText}`;
@@ -97,10 +82,10 @@ export default class AccessibilityUtils {
     announce(message) {
         // Clear previous announcement
         this.liveRegion.textContent = '';
-        
+
         // Trigger reflow
         void this.liveRegion.offsetWidth;
-        
+
         // Set new announcement
         this.liveRegion.textContent = message;
     }
@@ -132,8 +117,9 @@ export default class AccessibilityUtils {
 
     formatTimeText(timeText) {
         timeText = timeText.trim();
-    
+
         const timeFormats = {
+            's': 'seconds',
             'm': 'minutes',
             'h': 'hours',
             'd': 'days',
@@ -146,7 +132,7 @@ export default class AccessibilityUtils {
             const [, number, unit] = match;
             return `${number} ${timeFormats[unit]} ago`;
         }
-        
+
         return timeText;
     }
 }
