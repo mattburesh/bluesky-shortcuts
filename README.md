@@ -4,7 +4,7 @@ A browser extension for adding shortcuts to bsky.app.
 
 ## Install
 
-[![Available from FireFox Add-ons](assets/firefox.png)](https://addons.mozilla.org/en-US/firefox/addon/bsky-shortcuts/)
+[![Available from FireFox Add-ons](assets/firefox.png)](https://addons.mozilla.org/en-US/firefox/addon/bluesky-shortcuts/)
 [![Available in the Chrome Web Store](assets/chrome.png)](https://chrome.google.com/webstore/detail/bsky-shortcuts/cimigenihbmedhakgecdgbjgmplfjkjj/1)
 
 ## Development
