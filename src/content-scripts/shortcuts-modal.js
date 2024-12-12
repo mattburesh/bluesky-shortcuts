@@ -19,48 +19,88 @@ class ShortcutsModal {
         this.initialize();
     }
 
+    createShortcutItem(shortcut) {
+        const item = document.createElement('div');
+        item.className = 'bsky-shortcut-item';
+
+        const keysContainer = document.createElement('div');
+        keysContainer.className = 'bsky-shortcut-keys';
+
+        if (shortcut.modifier) {
+            const modKey = document.createElement('span');
+            modKey.className = 'bsky-shortcut-key';
+            modKey.textContent = shortcut.modifier;
+            keysContainer.appendChild(modKey);
+
+            const plus = document.createElement('span');
+            plus.className = 'bsky-shortcut-plus';
+            plus.textContent = '+';
+            keysContainer.appendChild(plus);
+        }
+
+        const key = document.createElement('span');
+        key.className = 'bsky-shortcut-key';
+        key.textContent = shortcut.key;
+        keysContainer.appendChild(key);
+
+        const desc = document.createElement('span');
+        desc.className = 'bsky-shortcut-description';
+        desc.textContent = shortcut.description;
+
+        item.appendChild(keysContainer);
+        item.appendChild(desc);
+        return item;
+    }
+
     initialize() {
-        this.modalContainer = document.createElement('div');
-        this.modalContainer.className = 'bsky-shortcuts-modal';
-        this.modalContainer.style.display = 'none';
+        const modal = document.createElement('div');
+        modal.className = 'bsky-shortcuts-modal';
+        modal.style.display = 'none';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'bsky-shortcuts-overlay';
 
-        this.modalContainer.innerHTML = `
-            <div class="bsky-shortcuts-overlay">
-                <div class="bsky-shortcuts-content">
-                    <div class="bsky-shortcuts-header">
-                        <h2>Keyboard Shortcuts</h2>
-                        <button class="bsky-shortcuts-close">×</button>
-                    </div>
-                    <div class="bsky-shortcuts-list">
-                        ${this.shortcuts.map(shortcut => `
-                            <div class="bsky-shortcut-item">
-                                <div class="bsky-shortcut-keys">
-                                    ${shortcut.modifier ? 
-                                        `<span class="bsky-shortcut-key">${shortcut.modifier}</span>
-                                         <span class="bsky-shortcut-plus">+</span>` 
-                                        : ''
-                                    }
-                                    <span class="bsky-shortcut-key">${shortcut.key}</span>
-                                </div>
-                                <span class="bsky-shortcut-description">${shortcut.description}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            </div>
-        `;
+        const content = document.createElement('div');
+        content.className = 'bsky-shortcuts-content';
 
-        document.body.appendChild(this.modalContainer);
+        const header = document.createElement('div');
+        header.className = 'bsky-shortcuts-header';
 
-        this.modalContainer.querySelector('.bsky-shortcuts-close').addEventListener('click', () => this.hide());
-        this.modalContainer.querySelector('.bsky-shortcuts-overlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) this.hide();
+        const title = document.createElement('h2');
+        title.textContent = 'Keyboard Shortcuts';
+
+        const close = document.createElement('button');
+        close.className = 'bsky-shortcuts-close';
+        close.textContent = '×';
+        close.addEventListener('click', () => this.hide());
+
+        header.appendChild(title);
+        header.appendChild(close);
+
+        const list = document.createElement('div');
+        list.className = 'bsky-shortcuts-list';
+        
+        this.shortcuts.forEach(shortcut => {
+            list.appendChild(this.createShortcutItem(shortcut));
         });
+
+        content.appendChild(header);
+        content.appendChild(list);
+        overlay.appendChild(content);
+        modal.appendChild(overlay);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) this.hide();
+        });
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible) {
                 this.hide();
             }
         });
+
+        this.modalContainer = modal;
+        document.body.appendChild(modal);
     }
 
     show() {
