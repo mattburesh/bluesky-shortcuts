@@ -1,5 +1,6 @@
 import config from '../config/shortcuts.json';
 import KeyboardShortcutManager from './keyboard-handler';
+import ShortcutsModal from './shortcuts-modal';
 import DOMUtils from './dom-utils';
 import Logger from '../utils/logger';
 import * as css from "../../assets/style.css";
@@ -13,6 +14,7 @@ class BlueSkyShortcuts {
 
         this.logger = new Logger();
         this.initializeExtension();
+        this.shortcutsModal = new ShortcutsModal();
     }
 
     async initializeExtension() {
@@ -72,6 +74,10 @@ class BlueSkyShortcuts {
             },
             [config.shortcuts.loadMore]: {
                 action: this.loadMore.bind(this)
+            },
+            [config.shortcuts.showShortcuts]: {
+                action: () => this.shortcutsModal.toggle(),
+                allowedModifiers: ['shift']
             }
         };
 

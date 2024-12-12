@@ -2,3 +2,165 @@
     border: 2px solid #0070FF;
     transition: border 0.2s ease;
 }
+
+.bsky-shortcut-keys {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bsky-shortcut-key {
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: 600;
+}
+
+.bsky-shortcut-plus {
+    color: #666;
+}
+
+/* Light theme */
+.bsky-shortcuts-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+}
+
+.bsky-shortcuts-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.bsky-shortcuts-content {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bsky-shortcuts-header {
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.bsky-shortcuts-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.bsky-shortcuts-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: #666;
+}
+
+.bsky-shortcuts-close:hover {
+    color: #000;
+}
+
+.bsky-shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.bsky-shortcut-item:not(:last-of-type) {
+    border-bottom: 1px solid #eee;
+}
+
+.bsky-shortcut-key {
+    background: #f3f4f6;
+    color: #666;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: 600;
+}
+
+.bsky-shortcut-description {
+    color: #666;
+    margin-left: 1rem;
+    text-align: right;
+    flex-grow: 1;
+}
+
+/* Dark theme */
+.theme--dark .bsky-shortcuts-content {
+    background: #000;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme--dark .bsky-shortcut-key {
+    background: #222;
+    color: #fff;
+}
+
+.theme--dark .bsky-shortcut-description {
+    color: #999;
+}
+
+.theme--dark .bsky-shortcuts-close {
+    color: #999;
+}
+
+.theme--dark .bsky-shortcuts-close:hover {
+    color: #fff;
+}
+
+.theme--dark .bsky-shortcut-item {
+    border-color:#222;
+}
+
+/* Dim theme */
+.theme--dim .bsky-shortcuts-content {
+    background: #1a1e2b;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme--dim .bsky-shortcut-key {
+    background: #2d333f;
+    color: #fff;
+}
+
+.theme--dim .bsky-shortcut-description {
+    color: #a1abc0;
+}
+
+.theme--dim .bsky-shortcuts-close {
+    color: #a1abc0;
+}
+
+.theme--dim .bsky-shortcuts-close:hover {
+    color: #fff;
+}
+
+.theme--dim .bsky-shortcut-item {
+    border-color: #2d333f;
+}
