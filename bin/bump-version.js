@@ -1,13 +1,12 @@
-fs = require('fs')
-path = require('path')
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
-let fileName = path.dirname(__dirname) + '/src/manifest.json'
-const __VERSION__ = process.env.npm_package_version
+const bumpType = process.argv[2] || 'patch';
 
-let manifestJSON = JSON.parse(fs.readFileSync(fileName, 'utf8'))
-if (manifestJSON.version != __VERSION__) {
-    console.log("Change in versions, updating manifest file...")
-    manifestJSON.version = __VERSION__
+execSync(`npm version ${bumpType} --no-git-tag-version`);
 
-    fs.writeFileSync(fileName, JSON.stringify(manifestJSON, null, 4))
-}
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+const newVersion = packageJson.version;
+
+console.log(`Bumped version to ${newVersion}`);

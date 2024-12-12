@@ -46,6 +46,7 @@ module.exports = (env) => {
                         from: "src/manifest.json",
                         transform: (content) => {
                             const manifest = generateManifest(browser);
+                            manifest.version = require('./package.json').version;
                             return JSON.stringify(manifest, null, 2);
                         }
                     },

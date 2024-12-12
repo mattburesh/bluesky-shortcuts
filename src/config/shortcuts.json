@@ -9,6 +9,7 @@
         "expandPhoto": "o",
         "openPost": "Enter",
         "focusSearch": "/",
+        "showShortcuts": "?",
         "loadMore": "."
     },
     "behaviors": {
