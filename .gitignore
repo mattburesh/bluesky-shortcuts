@@ -1,6 +1,7 @@
 .idea/*
 *.zip
-node_modules
+config.local.js
 
+node_modules
 build/*
 dist/*
