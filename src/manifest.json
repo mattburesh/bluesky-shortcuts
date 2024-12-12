@@ -1,8 +1,7 @@
 {
-    "name": "bsky-shortcuts",
+    "name": "bluesky-shortcuts",
     "author": "Matt Buresh",
-    "homepage_url": "https://github.com/mattburesh/bsky-shortcuts",
-    "version": "1.0.6",
+    "homepage_url": "https://github.com/mattburesh/bluesky-shortcuts",
     "description": "Adds keyboard shortcuts to bsky.app",
     "icons": {},
     "content_scripts": [

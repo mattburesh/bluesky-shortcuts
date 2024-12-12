@@ -1,5 +1,5 @@
 {
-    "name": "bsky-shortcuts",
+    "name": "bluesky-shortcuts",
     "version": "1.1.0",
     "description": "Adds keyboard shortcuts to bsky.app",
     "scripts": {
