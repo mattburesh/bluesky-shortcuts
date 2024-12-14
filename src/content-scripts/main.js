@@ -213,13 +213,31 @@ class BlueSkyShortcuts {
         }
     }
 
-    loadMore() {
+    async loadMore() {
         const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
 
         if (loadPostsButton) {
             loadPostsButton.click();
             this.currentPost = null;
-            this.moveToNextPost();
+
+            try {
+                if (this.currentController) {
+                    this.currentController.abort();
+                }
+                this.currentController = new AbortController();
+                await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, this.currentController.signal);
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const visiblePosts = DOMUtils.findVisiblePosts();
+                if (visiblePosts.length > 0) {
+                    this.currentPost = visiblePosts[0];
+                    DOMUtils.safelyScrollIntoView(this.currentPost);
+                }
+            } catch (error) {
+                if (error !== 'cancelled') {
+                    this.logger.error('Failed to load new posts', error);
+                }
+            }
         }
     }
 }
