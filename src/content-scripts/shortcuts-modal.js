@@ -30,7 +30,7 @@ class ShortcutsModal {
         keysContainer.className = 'bsky-shortcut-keys';
 
         if (shortcut.modifier) {
-            const modKey = document.createElement('span');
+            const modKey = document.createElement('kbd');
             modKey.className = 'bsky-shortcut-key';
             modKey.textContent = shortcut.modifier;
             keysContainer.appendChild(modKey);
@@ -39,12 +39,27 @@ class ShortcutsModal {
             plus.className = 'bsky-shortcut-plus';
             plus.textContent = '+';
             keysContainer.appendChild(plus);
-        }
 
-        const key = document.createElement('span');
-        key.className = 'bsky-shortcut-key';
-        key.textContent = shortcut.key;
-        keysContainer.appendChild(key);
+            const key = document.createElement('kbd');
+            key.className = 'bsky-shortcut-key';
+            key.textContent = shortcut.key;
+            keysContainer.appendChild(key);
+        } else if (shortcut.key.startsWith('g')) {
+            const gKey = document.createElement('kbd');
+            gKey.className = 'bsky-shortcut-key';
+            gKey.textContent = 'g';
+            keysContainer.appendChild(gKey);
+
+            const secondKey = document.createElement('kbd');
+            secondKey.className = 'bsky-shortcut-key';
+            secondKey.textContent = shortcut.key.slice(1);
+            keysContainer.appendChild(secondKey);
+        } else {
+            const key = document.createElement('kbd');
+            key.className = 'bsky-shortcut-key';
+            key.textContent = shortcut.key;
+            keysContainer.appendChild(key);
+        }
 
         const desc = document.createElement('span');
         desc.className = 'bsky-shortcut-description';

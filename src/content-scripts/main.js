@@ -20,8 +20,12 @@ class BlueSkyShortcuts {
     async initializeExtension() {
         try {
             await this.waitForAppLoad();
+            try {
+                await this.initializeFeedTabs();
+            } catch (e) {
+                this.logger.debug('Feed tabs not found - likely on a page without a feed');
+            }
             this.setupShortcuts();
-            this.setupFeedTabs();
         } catch (error) {
             this.logger.error('Extension initialization failed', error);
         }
@@ -31,17 +35,22 @@ class BlueSkyShortcuts {
         await DOMUtils.waitForElement('div.css-175oi2r.r-13awgt0.r-12vffkv');
     }
 
-    setupFeedTabs() {
+    async initializeFeedTabs() {
         try {
-            const tabContainer = document.querySelector('[data-testid="homeScreenFeedTabs"] > div > div');
+            const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
             this.feedTabs = [...tabContainer.children].map(tab => ({
                 element: tab,
                 isActive: tab.firstChild.style.getPropertyValue('border-bottom-color') ? true : false
             }));
 
             this.currentFeedIndex = this.feedTabs.findIndex(tab => tab.isActive);
+            if (this.currentFeedIndex === -1) {
+                this.logger.debug('No active tab found, defaulting to first tab');
+                this.currentFeedIndex = 0;
+            }
         } catch (error) {
             this.logger.error('Failed to initialize feed tabs', error);
+            throw error;
         }
     }
 
