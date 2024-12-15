@@ -14,6 +14,9 @@ class ShortcutsModal {
             { modifier: 'Shift', key: 'c', description: 'Previous pinned feed' },
             { key: '.', description: 'Load more posts' },
             { key: '?', description: 'Toggle shortcuts' },
+            { key: 'g h', description: 'Go Home' },
+            { key: 'g p', description: 'Go to Profile' },
+            { key: 'g n', description: 'Go to Notifications' }
         ];
 
         this.initialize();
@@ -56,7 +59,7 @@ class ShortcutsModal {
         const modal = document.createElement('div');
         modal.className = 'bsky-shortcuts-modal';
         modal.style.display = 'none';
-        
+
         const overlay = document.createElement('div');
         overlay.className = 'bsky-shortcuts-overlay';
 
@@ -79,7 +82,7 @@ class ShortcutsModal {
 
         const list = document.createElement('div');
         list.className = 'bsky-shortcuts-list';
-        
+
         this.shortcuts.forEach(shortcut => {
             list.appendChild(this.createShortcutItem(shortcut));
         });

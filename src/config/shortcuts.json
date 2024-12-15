@@ -10,7 +10,10 @@
         "openPost": "Enter",
         "focusSearch": "/",
         "showShortcuts": "?",
-        "loadMore": "."
+        "loadMore": ".",
+        "goHome": "gh",
+        "goProfile": "gp",
+        "goNotifications": "gn"
     },
     "behaviors": {
         "scrollBehavior": "smooth",
