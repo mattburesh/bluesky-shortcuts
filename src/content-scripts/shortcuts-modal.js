@@ -133,15 +133,6 @@ class ShortcutsModal {
         columnsContainer.appendChild(regularSection);
         columnsContainer.appendChild(navigationSection);
 
-
-
-        // const list = document.createElement('div');
-        // list.className = 'bsky-shortcuts-list';
-        //
-        // this.shortcuts.forEach(shortcut => {
-        //     list.appendChild(this.createShortcutItem(shortcut));
-        // });
-
         content.appendChild(header);
         content.appendChild(columnsContainer);
         overlay.appendChild(content);
