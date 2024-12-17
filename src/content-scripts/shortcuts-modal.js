@@ -122,8 +122,6 @@ class ShortcutsModal {
         header.appendChild(title);
         header.appendChild(close);
 
-        // here
-
         const columnsContainer = document.createElement('div');
         columnsContainer.className = 'bsky-shortcuts-columns';
 
