@@ -30,15 +30,25 @@ A browser extension for adding shortcuts to bsky.app.
 
 ## Shortcuts 
 
-| Key | Action | Status      |
-|-----|--------|-------------|
-| J   | Move Down | Complete    |
-| K   | Move Up | Complete    |
-| L   | Like Post | Complete    |
-| R   | Reply  | Complete    |
-| T   | Repost / Quote | In Progress |
-| O   | Expand Image | Complete    |
-| Enter | Open Post | Complete  |
-| /   | Focus Search | Complete |
-| ?   | Show Shortcuts | In Progress |
-| C   | Cycle Saved Feeds | Complete    |
+## Shortcuts
+
+| Key | Action |
+|-----|---------|
+| j   | Move Down |
+| k   | Move Up |
+| .   | Load More Posts |
+| Enter | Open Post |
+| l   | Like Post |
+| r   | Reply |
+| o   | Expand Image |
+| c   | Cycle Forward Through Saved Feeds |
+| Shift + c | Cycle Backward Through Saved Feeds |
+| /   | Focus Search |
+| g h | Go to Home |
+| g p | Go to Profile |
+| g n | Go to Notifications |
+| g c | Go to Chat |
+| g f | Go to Feeds |
+| g l | Go to Lists |
+| g s | Go to Settings |
+| ?   | Show Shortcuts |
