@@ -13,7 +13,10 @@ class ShortcutsModal {
             { key: 'c', description: 'Next pinned feed' },
             { modifier: 'Shift', key: 'c', description: 'Previous pinned feed' },
             { key: '.', description: 'Load more posts' },
-            { key: '?', description: 'Toggle shortcuts' },
+            { key: '?', description: 'Toggle shortcuts' }
+        ];
+
+        this.goShortcuts = [
             { key: 'g h', description: 'Go Home' },
             { key: 'g p', description: 'Go to Profile' },
             { key: 'g n', description: 'Go to Notifications' },
@@ -74,6 +77,26 @@ class ShortcutsModal {
         return item;
     }
 
+    createShortcutSection(title, shortcuts) {
+        const section = document.createElement('div');
+        section.className = 'bsky-shortcuts-section';
+
+        const sectionTitle = document.createElement('h3');
+        sectionTitle.className = 'bsky-shortcuts-section-title';
+        sectionTitle.textContent = title;
+        section.appendChild(sectionTitle);
+
+        const list = document.createElement('div');
+        list.className = 'bsky-shortcuts-list';
+
+        shortcuts.forEach(shortcut => {
+            list.appendChild(this.createShortcutItem(shortcut));
+        });
+
+        section.appendChild(list);
+        return section;
+    }
+
     initialize() {
         const modal = document.createElement('div');
         modal.className = 'bsky-shortcuts-modal';
@@ -99,15 +122,28 @@ class ShortcutsModal {
         header.appendChild(title);
         header.appendChild(close);
 
-        const list = document.createElement('div');
-        list.className = 'bsky-shortcuts-list';
+        // here
 
-        this.shortcuts.forEach(shortcut => {
-            list.appendChild(this.createShortcutItem(shortcut));
-        });
+        const columnsContainer = document.createElement('div');
+        columnsContainer.className = 'bsky-shortcuts-columns';
+
+        const regularSection = this.createShortcutSection('General', this.shortcuts);
+        const navigationSection = this.createShortcutSection('Navigation', this.goShortcuts);
+
+        columnsContainer.appendChild(regularSection);
+        columnsContainer.appendChild(navigationSection);
+
+
+
+        // const list = document.createElement('div');
+        // list.className = 'bsky-shortcuts-list';
+        //
+        // this.shortcuts.forEach(shortcut => {
+        //     list.appendChild(this.createShortcutItem(shortcut));
+        // });
 
         content.appendChild(header);
-        content.appendChild(list);
+        content.appendChild(columnsContainer);
         overlay.appendChild(content);
         modal.appendChild(overlay);
 

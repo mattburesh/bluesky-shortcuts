@@ -48,7 +48,7 @@
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    max-width: 480px;
+    max-width: 800px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
@@ -82,6 +82,21 @@
     color: #000;
 }
 
+.bsky-shortcuts-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.bsky-shortcuts-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+    color: #666;
+}
+
 .bsky-shortcut-item {
     display: flex;
     justify-content: space-between;
@@ -109,21 +124,10 @@
     flex-grow: 1;
 }
 
-.bsky-shortcuts-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-}
-
-@media (min-width: 640px) {
-    .bsky-shortcuts-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .bsky-shortcuts-grid {
-        grid-template-columns: repeat(3, 1fr);
+@media (max-width: 640px) {
+    .bsky-shortcuts-columns {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 }
 
@@ -152,7 +156,12 @@
 }
 
 .theme--dark .bsky-shortcut-item {
-    border-color:#222;
+    border-color: #222;
+}
+
+.theme--dark .bsky-shortcuts-section-title {
+    border-color: #222;
+    color: #999;
 }
 
 /* Dim theme */
@@ -181,4 +190,9 @@
 
 .theme--dim .bsky-shortcut-item {
     border-color: #2d333f;
+}
+
+.theme--dim .bsky-shortcuts-section-title {
+    border-color: #2d333f;
+    color: #a1abc0;
 }
