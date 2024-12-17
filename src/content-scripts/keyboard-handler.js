@@ -1,6 +1,8 @@
 export default class KeyboardShortcutManager {
     constructor(actionMap) {
         this.actionMap = actionMap;
+        this.prefixKey = null;
+        this.prefixTimeout = null;
         this.setupListeners();
     }
 
@@ -11,7 +13,23 @@ export default class KeyboardShortcutManager {
     handleKeyEvent(event) {
         // make sure keys like Enter aren't converted to lower case
         const key = event.key;
-        const normalizedKey = /^[a-zA-Z]$/.test(key) ? key.toLowerCase() : key;
+        let normalizedKey = /^[a-zA-Z]$/.test(key) ? key.toLowerCase() : key;
+
+        if (normalizedKey === 'g' && !this.prefixKey) {
+            event.preventDefault();
+            this.prefixKey = 'g';
+
+            this.prefixTimeout = setTimeout(() => {
+                this.prefixKey = null;
+            }, 500);
+            return;
+        }
+
+        if (this.prefixKey === 'g') {
+            clearTimeout(this.prefixTimeout);
+            normalizedKey = `g${normalizedKey}`;
+            this.prefixKey = null;
+        }
 
         const mapping = this.actionMap[normalizedKey];
         if (!mapping) return;
@@ -23,12 +41,12 @@ export default class KeyboardShortcutManager {
     }
 
     shouldPreventShortcut(event, allowedModifiers = []) {
-        const shouldPrevent = 
+        const shouldPrevent =
             document.activeElement.tagName === 'INPUT' ||
             document.activeElement.tagName === 'TEXTAREA' ||
             document.activeElement.role === 'textbox' ||
-            (event.ctrlKey && !allowedModifiers.includes('ctrl')) || 
-            (event.altKey && !allowedModifiers.includes('alt')) || 
+            (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
+            (event.altKey && !allowedModifiers.includes('alt')) ||
             (event.shiftKey && !allowedModifiers.includes('shift')) ||
             (event.metaKey && !allowedModifiers.includes('meta'));
 

@@ -21,27 +21,36 @@ class BlueSkyShortcuts {
         try {
             await this.waitForAppLoad();
             this.setupShortcuts();
-            this.setupFeedTabs();
+            try {
+                await this.initializeFeedTabs();
+            } catch (e) {
+                this.logger.debug('Feed tabs not found - likely on a page without a feed');
+            }
         } catch (error) {
             this.logger.error('Extension initialization failed', error);
         }
     }
 
     async waitForAppLoad() {
-        await DOMUtils.waitForElement('div[data-testid="followingFeedPage-feed-flatlist"]');
+        await DOMUtils.waitForElement('div.css-175oi2r.r-13awgt0.r-12vffkv');
     }
 
-    setupFeedTabs() {
+    async initializeFeedTabs() {
         try {
-            const tabContainer = document.querySelector('[data-testid="homeScreenFeedTabs"] > div > div');
+            const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
             this.feedTabs = [...tabContainer.children].map(tab => ({
                 element: tab,
                 isActive: tab.firstChild.style.getPropertyValue('border-bottom-color') ? true : false
             }));
 
             this.currentFeedIndex = this.feedTabs.findIndex(tab => tab.isActive);
+            if (this.currentFeedIndex === -1) {
+                this.logger.debug('No active tab found, defaulting to first tab');
+                this.currentFeedIndex = 0;
+            }
         } catch (error) {
             this.logger.error('Failed to initialize feed tabs', error);
+            throw error;
         }
     }
 
@@ -78,7 +87,28 @@ class BlueSkyShortcuts {
             [config.shortcuts.showShortcuts]: {
                 action: () => this.shortcutsModal.toggle(),
                 allowedModifiers: ['shift']
-            }
+            },
+            [config.shortcuts.goHome]: {
+                action: () => window.location.href = 'https://bsky.app/'
+            },
+            [config.shortcuts.goProfile]: {
+                action: this.goHome.bind(this)
+            },
+            [config.shortcuts.goNotifications]: {
+                action: () => window.location.href = 'https://bsky.app/notifications'
+            },
+            [config.shortcuts.goChat]: {
+                action: () => window.location.href = 'https://bsky.app/messages'
+            },
+            [config.shortcuts.goFeeds]: {
+                action: () => window.location.href = 'https://bsky.app/feeds'
+            },
+            [config.shortcuts.goLists]: {
+                action: () => window.location.href = 'https://bsky.app/lists'
+            },
+            [config.shortcuts.goSettings]: {
+                action: () => window.location.href = 'https://bsky.app/settings'
+            },
         };
 
         new KeyboardShortcutManager(actionMap);
@@ -91,7 +121,7 @@ class BlueSkyShortcuts {
             this.logger.warn('No visible posts found');
             return;
         }
-        
+
         if (!this.currentPost) {
             this.currentPost = visiblePosts[0];
         } else {
@@ -110,7 +140,7 @@ class BlueSkyShortcuts {
             this.logger.warn('No visible posts found');
             return;
         }
-        
+
         if (!this.currentPost) {
             this.currentPost = visiblePosts[visiblePosts.length - 1];
         } else {
@@ -148,7 +178,7 @@ class BlueSkyShortcuts {
 
     waitForFeedLoad() {
         const feedSelector = `[data-testid*="-feed-flatlist"]:nth-child(${this.currentFeedIndex + 1})`;
-        
+
         this.currentController = new AbortController();
 
         DOMUtils.waitForElement(feedSelector, 5000, this.currentController.signal)
@@ -168,8 +198,8 @@ class BlueSkyShortcuts {
 
     openPost() {
         const postLinks = [...this.currentPost.querySelectorAll('a[role="link"]')];
-    
-        const postLink = postLinks.find(link => 
+
+        const postLink = postLinks.find(link =>
             /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-zA-Z0-9]+$/.test(link.href)
         );
 
@@ -197,11 +227,11 @@ class BlueSkyShortcuts {
             searchInput.select(); // Optional: select all text for easy replacement
             return;
         }
-    
+
         const searchAnchor = document.querySelector('a[aria-label="Search"]');
         if (searchAnchor) {
             searchAnchor.click();
-            
+
             DOMUtils.waitForElement('input[aria-label="Search"]')
                 .then(element => {
                     element.focus();
@@ -238,6 +268,13 @@ class BlueSkyShortcuts {
                     this.logger.error('Failed to load new posts', error);
                 }
             }
+        }
+    }
+
+    goHome() {
+        const profileLink = document.querySelector('[aria-label="Profile"][role="link"]');
+        if (profileLink) {
+            profileLink.click();
         }
     }
 }
