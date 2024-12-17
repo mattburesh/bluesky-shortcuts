@@ -13,7 +13,11 @@
         "loadMore": ".",
         "goHome": "gh",
         "goProfile": "gp",
-        "goNotifications": "gn"
+        "goNotifications": "gn",
+        "goChat": "gc",
+        "goFeeds": "gf",
+        "goLists": "gl",
+        "goSettings": "gs"
     },
     "behaviors": {
         "scrollBehavior": "smooth",

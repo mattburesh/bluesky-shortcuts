@@ -20,12 +20,12 @@ class BlueSkyShortcuts {
     async initializeExtension() {
         try {
             await this.waitForAppLoad();
+            this.setupShortcuts();
             try {
                 await this.initializeFeedTabs();
             } catch (e) {
                 this.logger.debug('Feed tabs not found - likely on a page without a feed');
             }
-            this.setupShortcuts();
         } catch (error) {
             this.logger.error('Extension initialization failed', error);
         }
@@ -96,7 +96,19 @@ class BlueSkyShortcuts {
             },
             [config.shortcuts.goNotifications]: {
                 action: () => window.location.href = 'https://bsky.app/notifications'
-            }
+            },
+            [config.shortcuts.goChat]: {
+                action: () => window.location.href = 'https://bsky.app/messages'
+            },
+            [config.shortcuts.goFeeds]: {
+                action: () => window.location.href = 'https://bsky.app/feeds'
+            },
+            [config.shortcuts.goLists]: {
+                action: () => window.location.href = 'https://bsky.app/lists'
+            },
+            [config.shortcuts.goSettings]: {
+                action: () => window.location.href = 'https://bsky.app/settings'
+            },
         };
 
         new KeyboardShortcutManager(actionMap);

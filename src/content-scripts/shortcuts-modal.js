@@ -16,7 +16,11 @@ class ShortcutsModal {
             { key: '?', description: 'Toggle shortcuts' },
             { key: 'g h', description: 'Go Home' },
             { key: 'g p', description: 'Go to Profile' },
-            { key: 'g n', description: 'Go to Notifications' }
+            { key: 'g n', description: 'Go to Notifications' },
+            { key: 'g c', description: 'Go to Chat' },
+            { key: 'g f', description: 'Go to Feeds' },
+            { key: 'g l', description: 'Go to Lists' },
+            { key: 'g s', description: 'Go to Settings' }
         ];
 
         this.initialize();
