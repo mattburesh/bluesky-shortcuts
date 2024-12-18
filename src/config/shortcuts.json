@@ -4,6 +4,7 @@
         "previousPost": "k",
         "likePost": "l",
         "replyToPost": "r",
+        "repostPost": "t",
         "cycleFeed": "c",
         "newPost": "n",
         "expandPhoto": "o",
