@@ -16,13 +16,15 @@ export default class KeyboardShortcutManager {
         let normalizedKey = /^[a-zA-Z]$/.test(key) ? key.toLowerCase() : key;
 
         if (normalizedKey === 'g' && !this.prefixKey) {
-            event.preventDefault();
-            this.prefixKey = 'g';
+            if (!this.shouldPreventShortcut(event)) {
+                event.preventDefault();
+                this.prefixKey = 'g';
 
-            this.prefixTimeout = setTimeout(() => {
-                this.prefixKey = null;
-            }, 500);
-            return;
+                this.prefixTimeout = setTimeout(() => {
+                    this.prefixKey = null;
+                }, 500);
+                return;
+            }
         }
 
         if (this.prefixKey === 'g') {
