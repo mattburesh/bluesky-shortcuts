@@ -188,7 +188,7 @@ class BlueSkyShortcuts {
                 const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
                 
                 if (event.shiftKey) {
-                    const quoteItem = menuArray.find(item => item.getAttribute('aria-label') === 'Quote');
+                    const quoteItem = menuArray.find(item => item.getAttribute('aria-label') === 'Quote post');
                     if (quoteItem) {
                         quoteItem.click();
                     }
