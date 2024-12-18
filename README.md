@@ -40,6 +40,8 @@ A browser extension for adding shortcuts to bsky.app.
 | Enter | Open Post |
 | l   | Like Post |
 | r   | Reply |
+| t   | Repost (press again to undo) |
+| Shift + t | Quote Post |
 | o   | Expand Image |
 | c   | Cycle Forward Through Saved Feeds |
 | Shift + c | Cycle Backward Through Saved Feeds |
