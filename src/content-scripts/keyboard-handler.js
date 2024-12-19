@@ -43,16 +43,30 @@ export default class KeyboardShortcutManager {
     }
 
     shouldPreventShortcut(event, allowedModifiers = []) {
-        const shouldPrevent =
-            document.activeElement.tagName === 'INPUT' ||
-            document.activeElement.tagName === 'TEXTAREA' ||
-            document.activeElement.role === 'textbox' ||
-            (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
-            (event.altKey && !allowedModifiers.includes('alt')) ||
-            (event.shiftKey && !allowedModifiers.includes('shift')) ||
-            (event.metaKey && !allowedModifiers.includes('meta'));
+        const isInputElement = document.activeElement?.tagName === 'INPUT' || 
+      document.activeElement?.tagName === 'TEXTAREA' ||
+      document.activeElement?.getAttribute('role') === 'textbox' ||
+      document.activeElement?.contentEditable === 'true' || 
+      document.activeElement?.isContentEditable;
 
-        return shouldPrevent;
+        if (isInputElement) {
+            return true; // Just return true without preventDefault()
+        }
+
+        return (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
+         (event.altKey && !allowedModifiers.includes('alt')) ||
+         (event.shiftKey && !allowedModifiers.includes('shift')) ||
+         (event.metaKey && !allowedModifiers.includes('meta'));
+        // const shouldPrevent =
+        //     document.activeElement.tagName === 'INPUT' ||
+        //     document.activeElement.tagName === 'TEXTAREA' ||
+        //     document.activeElement.role === 'textbox' ||
+        //     (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
+        //     (event.altKey && !allowedModifiers.includes('alt')) ||
+        //     (event.shiftKey && !allowedModifiers.includes('shift')) ||
+        //     (event.metaKey && !allowedModifiers.includes('meta'));
+
+        // return shouldPrevent;
     }
 
     getActionForKey(keyCode) {
