@@ -50,23 +50,13 @@ export default class KeyboardShortcutManager {
       document.activeElement?.isContentEditable;
 
         if (isInputElement) {
-            return true; // Just return true without preventDefault()
+            return true;
         }
 
         return (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
          (event.altKey && !allowedModifiers.includes('alt')) ||
          (event.shiftKey && !allowedModifiers.includes('shift')) ||
          (event.metaKey && !allowedModifiers.includes('meta'));
-        // const shouldPrevent =
-        //     document.activeElement.tagName === 'INPUT' ||
-        //     document.activeElement.tagName === 'TEXTAREA' ||
-        //     document.activeElement.role === 'textbox' ||
-        //     (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
-        //     (event.altKey && !allowedModifiers.includes('alt')) ||
-        //     (event.shiftKey && !allowedModifiers.includes('shift')) ||
-        //     (event.metaKey && !allowedModifiers.includes('meta'));
-
-        // return shouldPrevent;
     }
 
     getActionForKey(keyCode) {

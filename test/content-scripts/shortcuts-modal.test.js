@@ -1,4 +1,3 @@
-// import ShortcutsModal from '../src/content-scripts/shortcuts-modal';
 import ShortcutsModal from '../../src/content-scripts/shortcuts-modal';
 
 describe('ShortcutsModal', () => {
