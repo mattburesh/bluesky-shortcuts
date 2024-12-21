@@ -113,6 +113,21 @@ class BlueSkyShortcuts {
             [config.shortcuts.goSettings]: {
                 action: () => window.location.href = 'https://bsky.app/settings'
             },
+            [config.shortcuts.hidePost]: {
+                action: () => this.handleMoreAction('hide post', 'postDropdownHideBtn')
+            },
+            [config.shortcuts.blockAccount]: {
+                action: () => this.handleMoreAction('block account', 'postDropdownBlockBtn')
+            },
+            [config.shortcuts.reportPost]: {
+                action: () => this.handleMoreAction('report post', 'postDropdownReportBtn')
+            },
+            [config.shortcuts.copyPostText]: {
+                action: () => this.handleMoreAction('copy post text', 'postDropdownCopyTextBtn')
+            },
+            [config.shortcuts.translatePost]: {
+                action: () => this.handleMoreAction('translate post', 'postDropdownTranslateBtn')
+            },
         };
 
         new KeyboardShortcutManager(actionMap);
@@ -170,7 +185,6 @@ class BlueSkyShortcuts {
 
     repostPost(event) {
         if (!this.currentPost) {
-            this.logger.warn('No post selected for repost');
             return;
         }
 
@@ -316,6 +330,38 @@ class BlueSkyShortcuts {
         if (profileLink) {
             profileLink.click();
         }
+    }
+
+    async handleMoreAction(actionType, testId) {
+        if (!this.currentPost) {
+            this.logger.error('No current post');
+            return;
+        }
+    
+        if (!this.clickMoreButton()) {
+            this.logger.error('No more button');
+            return;
+        }
+    
+        try {
+            await DOMUtils.waitForElement('[role="menuitem"]', 2000);
+            const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
+            const actionBtn = menuArray.find(item => item.getAttribute('data-testid') === testId);
+            actionBtn?.click();
+        } catch (error) {
+            this.logger.error(`Failed to ${actionType}`, error);
+        }
+    }
+
+    clickMoreButton() {
+        const moreButton = this.currentPost.querySelector('[aria-label="Open post options menu"');
+        if (!moreButton) {
+            return false;
+        }
+        
+        this.logger.debug('Clicking more button');
+        moreButton.click();
+        return true;
     }
 }
 
