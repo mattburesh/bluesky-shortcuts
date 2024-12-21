@@ -68,6 +68,10 @@ class BlueSkyShortcuts {
             [config.shortcuts.replyToPost]: {
                 action: this.replyToPost.bind(this)
             },
+            [config.shortcuts.repostPost]: {
+                action: this.repostPost.bind(this),
+                allowedModifiers: ['shift']
+            },
             [config.shortcuts.cycleFeed]: {
                 action: this.cycleFeed.bind(this),
                 allowedModifiers: ['shift']
@@ -162,6 +166,45 @@ class BlueSkyShortcuts {
     replyToPost() {
         let reply = this.currentPost.querySelector('[aria-label*="Reply ("]')
         reply.click()
+    }
+
+    repostPost(event) {
+        if (!this.currentPost) {
+            this.logger.warn('No post selected for repost');
+            return;
+        }
+
+        const repostButton = this.currentPost.querySelector('[aria-label="Repost or quote post"]');
+        if (!repostButton) {
+            this.logger.warn('Repost button not found');
+            return;
+        }
+
+        repostButton.click();
+
+        // Wait for the repost menu to appear
+        DOMUtils.waitForElement('[role="menuitem"]', 2000)
+            .then(() => {
+                const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
+                
+                if (event.shiftKey) {
+                    const quoteItem = menuArray.find(item => item.getAttribute('aria-label') === 'Quote post');
+                    if (quoteItem) {
+                        quoteItem.click();
+                    }
+                } else {
+                    const repostItem = menuArray.find(item => 
+                        item.getAttribute('aria-label') === 'Repost' || 
+                        item.getAttribute('aria-label') === 'Undo repost'
+                    );
+                    if (repostItem) {
+                        repostItem.click();
+                    }
+                }
+            })
+            .catch(error => {
+                this.logger.error('Failed to find repost menu', error);
+            });
     }
 
     cycleFeed(event) {
