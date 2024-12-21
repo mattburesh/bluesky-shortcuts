@@ -1,6 +1,8 @@
 class ShortcutsModal {
     constructor() {
         this.isVisible = false;
+
+        // general
         this.shortcuts = [
             { key: 'j', description: 'Move to next post' },
             { key: 'k', description: 'Move to previous post' },
@@ -17,6 +19,16 @@ class ShortcutsModal {
             { key: '?', description: 'Toggle shortcuts' }
         ];
 
+        // more
+        this.moreShortcuts = [
+            { key: 'h', description: 'Hide post' },
+            { key: 'b', description: 'Block account' },
+            { key: 'x', description: 'Report post' },
+            { key: 't', description: 'Translate post' },
+            { key: 'y', description: 'Copy post text' }
+        ];
+
+        // navigation
         this.goShortcuts = [
             { key: 'g h', description: 'Go Home' },
             { key: 'g p', description: 'Go to Profile' },
@@ -127,9 +139,11 @@ class ShortcutsModal {
         columnsContainer.className = 'bsky-shortcuts-columns';
 
         const regularSection = this.createShortcutSection('General', this.shortcuts);
+        const moreSection = this.createShortcutSection('More', this.moreShortcuts);
         const navigationSection = this.createShortcutSection('Navigation', this.goShortcuts);
 
         columnsContainer.appendChild(regularSection);
+        columnsContainer.appendChild(moreSection);
         columnsContainer.appendChild(navigationSection);
 
         content.appendChild(header);

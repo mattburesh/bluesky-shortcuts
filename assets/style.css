@@ -131,6 +131,16 @@
     }
 }
 
+@media (min-width: 640px) {
+    .bsky-shortcuts-section:first-of-type {
+        grid-row: 1 / 3;
+    }
+    
+    .bsky-shortcuts-section:not(:first-of-type) {
+        grid-column-start: 2;
+    }
+}
+
 /* Dark theme */
 .theme--dark .bsky-shortcuts-content {
     background: #000;
