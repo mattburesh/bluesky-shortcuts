@@ -37,8 +37,9 @@ module.exports = (env) => {
                 new TerserPlugin({
                     extractComments: false,
                 }),
-            ]
+            ], 
         },
+        devtool: false,
         plugins: [
             new CopyPlugin({
                 patterns: [

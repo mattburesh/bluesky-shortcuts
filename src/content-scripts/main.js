@@ -193,9 +193,6 @@ class BlueSkyShortcuts {
             });
     }
 
-    // don't know if this needs to exist, believe the shortcut exists on bsky.app
-    newPost() {}
-
     openPost() {
         const postLinks = [...this.currentPost.querySelectorAll('a[role="link"]')];
 
