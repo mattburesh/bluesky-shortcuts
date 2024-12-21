@@ -113,6 +113,21 @@ class BlueSkyShortcuts {
             [config.shortcuts.goSettings]: {
                 action: () => window.location.href = 'https://bsky.app/settings'
             },
+            [config.shortcuts.hidePost]: {
+                action: () => this.handleOptionsAction('hide post', 'postDropdownHideBtn')
+            },
+            [config.shortcuts.blockAccount]: {
+                action: () => this.handleOptionsAction('block account', 'postDropdownBlockBtn')
+            },
+            [config.shortcuts.reportPost]: {
+                action: () => this.handleOptionsAction('report post', 'postDropdownReportBtn')
+            },
+            [config.shortcuts.copyPostText]: {
+                action: () => this.handleOptionsAction('copy post text', 'postDropdownCopyTextBtn')
+            },
+            [config.shortcuts.translatePost]: {
+                action: () => this.handleOptionsAction('translate post', 'postDropdownTranslateBtn')
+            },
         };
 
         new KeyboardShortcutManager(actionMap);
@@ -170,7 +185,6 @@ class BlueSkyShortcuts {
 
     repostPost(event) {
         if (!this.currentPost) {
-            this.logger.warn('No post selected for repost');
             return;
         }
 
@@ -316,6 +330,38 @@ class BlueSkyShortcuts {
         if (profileLink) {
             profileLink.click();
         }
+    }
+
+    async handleOptionsAction(actionType, testId) {
+        if (!this.currentPost) {
+            this.logger.error('No current post');
+            return;
+        }
+    
+        if (!this.clickPostOptionsButton()) {
+            this.logger.error('No more button');
+            return;
+        }
+    
+        try {
+            await DOMUtils.waitForElement('[role="menuitem"]', 2000);
+            const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
+            const actionBtn = menuArray.find(item => item.getAttribute('data-testid') === testId);
+            actionBtn?.click();
+        } catch (error) {
+            this.logger.error(`Failed to ${actionType}`, error);
+        }
+    }
+
+    clickPostOptionsButton() {
+        const optionsButton = this.currentPost.querySelector('[aria-label="Open post options menu"');
+        if (!optionsButton) {
+            return false;
+        }
+        
+        this.logger.debug('Clicking more button');
+        optionsButton.click();
+        return true;
     }
 }
 

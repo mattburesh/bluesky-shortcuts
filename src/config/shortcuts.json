@@ -12,13 +12,20 @@
         "focusSearch": "/",
         "showShortcuts": "?",
         "loadMore": ".",
+
         "goHome": "gh",
         "goProfile": "gp",
         "goNotifications": "gn",
         "goChat": "gc",
         "goFeeds": "gf",
         "goLists": "gl",
-        "goSettings": "gs"
+        "goSettings": "gs",
+
+        "hidePost": "h",
+        "blockAccount": "b",
+        "reportPost": "x",
+        "copyPostText": "y",
+        "translatePost": "t"
     },
     "behaviors": {
         "scrollBehavior": "smooth",

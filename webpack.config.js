@@ -9,11 +9,15 @@ function generateManifest(browser) {
     if (browser === 'firefox') {
         return {
             ...baseManifest,
+            content_security_policy: "script-src 'self'; object-src 'self'",
             manifest_version: 2,
         }
     } else {
         return {
             ...baseManifest,
+            content_security_policy: {
+                extension_pages: "script-src 'self'; object-src 'self'"
+            },
             manifest_version: 3,
         }
     }
