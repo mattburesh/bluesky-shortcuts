@@ -20,7 +20,7 @@ class ShortcutsModal {
         ];
 
         // more
-        this.moreShortcuts = [
+        this.postOptions = [
             { key: 'h', description: 'Hide post' },
             { key: 'b', description: 'Block account' },
             { key: 'x', description: 'Report post' },
@@ -139,12 +139,12 @@ class ShortcutsModal {
         columnsContainer.className = 'bsky-shortcuts-columns';
 
         const regularSection = this.createShortcutSection('General', this.shortcuts);
-        const moreSection = this.createShortcutSection('More', this.moreShortcuts);
         const navigationSection = this.createShortcutSection('Navigation', this.goShortcuts);
+        const optionsSection = this.createShortcutSection('Post Options', this.postOptions);
 
         columnsContainer.appendChild(regularSection);
-        columnsContainer.appendChild(moreSection);
         columnsContainer.appendChild(navigationSection);
+        columnsContainer.appendChild(optionsSection);
 
         content.appendChild(header);
         content.appendChild(columnsContainer);
