@@ -24,8 +24,7 @@
         "hidePost": "h",
         "blockAccount": "b",
         "reportPost": "x",
-        "copyPostText": "y",
-        "translatePost": "t"
+        "copyPostText": "y"
     },
     "behaviors": {
         "scrollBehavior": "smooth",

@@ -24,7 +24,6 @@ class ShortcutsModal {
             { key: 'h', description: 'Hide post' },
             { key: 'b', description: 'Block account' },
             { key: 'x', description: 'Report post' },
-            { key: 't', description: 'Translate post' },
             { key: 'y', description: 'Copy post text' }
         ];
 

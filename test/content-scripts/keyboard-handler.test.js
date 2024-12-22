@@ -16,7 +16,13 @@ describe('KeyboardShortcutManager', () => {
       previousPost: jest.fn(),
       likePost: jest.fn(),
       cycleFeed: jest.fn(),
-      goHome: jest.fn()
+      goHome: jest.fn(),
+      hidePost: jest.fn(),
+      blockAccount: jest.fn(),
+      reportPost: jest.fn(),
+      copyPostText: jest.fn(),
+      replyToPost: jest.fn(),
+      repostPost: jest.fn()
     };
 
     manager = new KeyboardShortcutManager({
@@ -24,7 +30,13 @@ describe('KeyboardShortcutManager', () => {
       'k': { action: mockActions.previousPost },
       'l': { action: mockActions.likePost },
       'c': { action: mockActions.cycleFeed, allowedModifiers: ['shift'] },
-      'gh': { action: mockActions.goHome }
+      'gh': { action: mockActions.goHome },
+      'h': { action: mockActions.hidePost },
+      'b': { action: mockActions.blockAccount },
+      'x': { action: mockActions.reportPost },
+      'y': { action: mockActions.copyPostText },
+      'r': { action: mockActions.replyToPost },
+      't': { action: mockActions.repostPost, allowedModifiers: ['shift'] }
     });
   });
 
@@ -99,6 +111,48 @@ describe('KeyboardShortcutManager', () => {
       });
       richTextbox.dispatchEvent(event);
       expect(mockActions.nextPost).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Post menu options shortcuts', () => {
+    test('executes hide post action', () => {
+      const event = new KeyboardEvent('keydown', { 
+        key: 'h',
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+      expect(mockActions.hidePost).toHaveBeenCalledTimes(1);
+    });
+
+    test('executes block account action', () => {
+      const event = new KeyboardEvent('keydown', { 
+        key: 'b',
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+      expect(mockActions.blockAccount).toHaveBeenCalledTimes(1);
+    });
+
+    test('executes report post action', () => {
+      const event = new KeyboardEvent('keydown', { 
+        key: 'x',
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+      expect(mockActions.reportPost).toHaveBeenCalledTimes(1);
+    });
+
+    test('executes copy post text action', () => {
+      const event = new KeyboardEvent('keydown', { 
+        key: 'y',
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+      expect(mockActions.copyPostText).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -125,9 +125,6 @@ class BlueSkyShortcuts {
             [config.shortcuts.copyPostText]: {
                 action: () => this.handleOptionsAction('copy post text', 'postDropdownCopyTextBtn')
             },
-            [config.shortcuts.translatePost]: {
-                action: () => this.handleOptionsAction('translate post', 'postDropdownTranslateBtn')
-            },
         };
 
         new KeyboardShortcutManager(actionMap);
