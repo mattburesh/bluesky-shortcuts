@@ -1,4 +1,4 @@
-# bsky-shortcuts 
+# bluesky-shortcuts 
 
 A browser extension for adding shortcuts to bsky.app.
 
@@ -32,25 +32,25 @@ A browser extension for adding shortcuts to bsky.app.
 
 ## Shortcuts
 
-| Key | Action |
-|-----|---------|
-| j   | Move Down |
-| k   | Move Up |
-| .   | Load More Posts |
-| Enter | Open Post |
-| l   | Like Post |
-| r   | Reply |
-| t   | Repost (press again to undo) |
-| Shift + t | Quote Post |
-| o   | Expand Image |
-| c   | Cycle Forward Through Saved Feeds |
-| Shift + c | Cycle Backward Through Saved Feeds |
-| /   | Focus Search |
-| g h | Go to Home |
-| g p | Go to Profile |
-| g n | Go to Notifications |
-| g c | Go to Chat |
-| g f | Go to Feeds |
-| g l | Go to Lists |
-| g s | Go to Settings |
-| ?   | Show Shortcuts |
+| Key                             | Action                             |
+|---------------------------------|------------------------------------|
+| <kbd>j</kbd>                    | Move Down                          |
+| <kbd>k</kbd>                    | Move Up                            |
+| <kbd>.</kbd>                    | Load More Posts                    |
+| <kbd>Enter</kbd>                | Open Post                          |
+| <kbd>l</kbd>                    | Like Post                          |
+| <kbd>r</kbd>                    | Reply                              |
+| <kbd>t</kbd>                    | Repost (press again to undo)       |
+| <kbd>Shift</kbd> + <kbd>t</kbd> | Quote Post                         |
+| <kbd>o</kbd>                    | Expand Image                       |
+| <kbd>c</kbd>                    | Cycle Forward Through Saved Feeds  |
+| <kbd>Shift</kbd> + <kbd>c</kbd> | Cycle Backward Through Saved Feeds |
+| <kbd>/</kbd>                    | Focus Search                       |
+| <kbd>g</kbd> <kbd>h</kbd>       | Go to Home                         |
+| <kbd>g</kbd> <kbd>p</kbd>       | Go to Profile                      |
+| <kbd>g</kbd> <kbd>n             | Go to Notifications                |
+| <kbd>g</kbd> <kbd>c</kbd>       | Go to Chat                         |
+| <kbd>g</kbd> <kbd>f</kbd>       | Go to Feeds                        |
+| <kbd>g</kbd> <kbd>l</kbd>       | Go to Lists                        |
+| <kbd>g</kbd> <kbd>s</kbd>       | Go to Settings                     |
+| <kbd>?</kbd>                    | Show Shortcuts                     |
