@@ -14,14 +14,6 @@ class BlueSkyShortcuts {
 
         this.appState.subscribe(this.handleStateChange.bind(this));
         this.initializeExtension();
-        // this.currentFeedIndex = 0;
-        // this.feedTabs = [];
-        // this.currentPost = null;
-        // this.currentController = null;
-        //
-        // this.logger = new Logger();
-        // this.initializeExtension();
-        this.shortcutsModal = new ShortcutsModal();
         this.logger.debug('Extension initialized');
 
         window.addEventListener('unload', () => {
@@ -40,6 +32,7 @@ class BlueSkyShortcuts {
         try {
             await this.waitForAppLoad();
             this.setupShortcuts();
+            this.shortcutsModal = new ShortcutsModal();
             try {
                 await this.initializeFeedTabs();
             } catch (e) {
@@ -64,12 +57,10 @@ class BlueSkyShortcuts {
                 const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
                 const feedTabs = [...tabContainer.children].map(tab => ({
                     element: tab,
-                    isActive: tab.firstChild.style.getPropertyValue('border-bottom-color') ? true : false
+                    isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
                 }));
 
                 const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
-
-                // NEW: Update state instead of class properties
                 this.appState.updateState({
                     feedTabs,
                     currentFeedIndex: currentFeedIndex === -1 ? 0 : currentFeedIndex
@@ -267,29 +258,27 @@ class BlueSkyShortcuts {
 
         const direction = event.shiftKey ? -1 : 1;
         const newIndex = (currentFeedIndex + direction + feedTabs.length) % feedTabs.length;
+        const targetTab = feedTabs[newIndex];
+        if (!targetTab?.element) {
+            this.logger.error('Invalid feed tab');
+            return;
+        }
 
-        feedTabs[newIndex].element.click();
-        // NEW: Update state
+        targetTab.element.click();
         this.appState.updateState({
             currentFeedIndex: newIndex,
-            currentPost: null
+            currentPost: null,
+            feedTabs: feedTabs.map((tab, i) => ({
+                ...tab,
+                isActive: i === newIndex
+            }))
         });
 
         this.waitForFeedLoad();
-        // if (this.currentController) {
-        //     this.currentController.abort();
-        // }
-        //
-        // const direction = event.shiftKey ? -1 : 1;
-        // this.currentFeedIndex = (this.currentFeedIndex + direction + this.feedTabs.length) % this.feedTabs.length;
-        // this.feedTabs[this.currentFeedIndex].element.click();
-        // this.currentPost = null;
-        // this.waitForFeedLoad();
     }
 
     waitForFeedLoad() {
-        const { currentFeedIndex } = this.appState.state;
-        const feedSelector = `[data-testid*="-feed-flatlist"]:nth-child(${currentFeedIndex + 1})`;
+        const feedSelector = '[data-testid*="-feed-flatlist"]';
 
         if (this.appState.state.currentController) {
             this.appState.state.currentController.abort();
