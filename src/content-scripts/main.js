@@ -2,7 +2,6 @@ import config from '../config/shortcuts.json';
 import KeyboardShortcutManager from './keyboard-handler';
 import ShortcutsModal from './shortcuts-modal';
 import DOMUtils from './dom-utils';
-import FeedStateManager from './feed-state';
 import Logger from '../utils/logger';
 import AppState from './state-management';
 import * as css from "../../assets/style.css";
