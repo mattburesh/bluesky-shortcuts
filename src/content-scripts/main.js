@@ -8,8 +8,8 @@ import * as css from "../../assets/style.css";
 
 class BlueSkyShortcuts {
     constructor() {
-        this.appState = new AppState();
         this.logger = new Logger();
+        this.appState = new AppState();
         this.shortcutsModal = new ShortcutsModal();
 
         this.appState.subscribe(this.handleStateChange.bind(this));

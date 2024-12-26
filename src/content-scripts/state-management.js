@@ -1,5 +1,7 @@
+import Logger from '../utils/logger';
+
 class AppState {
-    constructor() {
+    constructor(logger) {
         this.state = {
             feedTabs: [],
             currentFeedIndex: 0,
@@ -8,6 +10,7 @@ class AppState {
             location: window.location.pathname
         };
         this.subscribers = new Set();
+        this.logger = logger ?? new Logger();
         this.observer = this.setupLocationObserver();
     }
 
@@ -64,7 +67,13 @@ class AppState {
      * @private
      */
     notifySubscribers() {
-        this.subscribers.forEach(callback => callback(this.state));
+        this.subscribers.forEach(callback => {
+            try {
+                callback(this.state);
+            } catch(error) {
+                this.logger.error('Error in subscriber callback:', error);
+            }
+        });
     }
 }
 
