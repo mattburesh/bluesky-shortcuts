@@ -24,7 +24,7 @@ class AppState {
     setupLocationObserver() {
         let lastPathname = window.location.pathname;
         const observer = new MutationObserver(() => {
-            requestAnimationFrame(() => {  // Throttle updates
+            requestAnimationFrame(() => {
                 if (window.location.pathname !== lastPathname) {
                     lastPathname = window.location.pathname;
                     this.updateState({ location: lastPathname });
@@ -34,7 +34,7 @@ class AppState {
 
         observer.observe(document.documentElement, {
             childList: true,
-            subtree: false  // Only watch top-level changes
+            subtree: false
         });
 
         return observer;

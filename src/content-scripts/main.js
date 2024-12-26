@@ -224,7 +224,6 @@ class BlueSkyShortcuts {
 
         repostButton?.click();
 
-        // Wait for the repost menu to appear
         DOMUtils.waitForElement('[role="menuitem"]', 2000)
             .then(() => {
                 const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
@@ -333,7 +332,7 @@ class BlueSkyShortcuts {
         const searchInput = document.querySelector('input[aria-label="Search"]');
         if (searchInput) {
             searchInput.focus();
-            searchInput.select(); // Optional: select all text for easy replacement
+            searchInput.select();
             return;
         }
 
