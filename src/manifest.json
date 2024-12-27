@@ -3,7 +3,10 @@
     "author": "Matt Buresh",
     "homepage_url": "https://github.com/mattburesh/bluesky-shortcuts",
     "description": "Adds keyboard shortcuts to bsky.app",
-    "icons": {},
+    "icons": {
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
     "content_scripts": [
         {
             "matches": ["https://bsky.app/*"],
