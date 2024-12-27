@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3] - 2024-12-27
+### Added
+- Add state management system for better post tracking ([#32](https://github.com/mattburesh/bluesky-shortcuts/pull/32))
+### Fixed
+- Fix post position tracking ([#33](https://github.com/mattburesh/bluesky-shortcuts/pull/33))
+- Improve load more shortcut reliability ([#34](https://github.com/mattburesh/bluesky-shortcuts/pull/34))
+
 ## [1.2.2] - 2024-12-22
 ### Added
 - Add repost/quote post shortcuts ([#27](https://github.com/mattburesh/bluesky-shortcuts/pull/27))

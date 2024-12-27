@@ -54,3 +54,6 @@ A browser extension for adding shortcuts to bsky.app.
 | <kbd>g</kbd> <kbd>l</kbd>       | Go to Lists                        |
 | <kbd>g</kbd> <kbd>s</kbd>       | Go to Settings                     |
 | <kbd>?</kbd>                    | Show Shortcuts                     |
+
+Changelog
+See [CHANGELOG.md](CHANGELOG.md) for a complete list of changes.
