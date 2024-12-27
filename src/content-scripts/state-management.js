@@ -26,18 +26,29 @@ class AppState {
      */
     setupLocationObserver() {
         let lastPathname = window.location.pathname;
+        let lastUpdate = Date.now();
+        const THROTTLE_MS = 100;
+
         const observer = new MutationObserver(() => {
-            requestAnimationFrame(() => {
-                if (window.location.pathname !== lastPathname) {
-                    lastPathname = window.location.pathname;
-                    this.updateState({ location: lastPathname });
-                }
-            });
+            const now = Date.now();
+            if (now - lastUpdate < THROTTLE_MS) {
+                return;
+            }
+
+            const currentPathname = window.location.pathname;
+            if (currentPathname !== lastPathname) {
+                lastPathname = currentPathname;
+                lastUpdate = now;
+                this.updateState({ location: currentPathname });
+            }
         });
 
-        observer.observe(document.documentElement, {
+        const urlContainer = document.querySelector('[role="main"]') || document.body;
+        observer.observe(urlContainer, {
             childList: true,
-            subtree: false
+            subtree: true,
+            characterData: false,
+            attributes: false
         });
 
         return observer;

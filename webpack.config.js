@@ -2,6 +2,7 @@ const path = require('path')
 const CopyPlugin = require("copy-webpack-plugin");
 const ZipPlugin = require('zip-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
 function generateManifest(browser) {
     const baseManifest = require('./src/manifest.json');
@@ -57,7 +58,10 @@ module.exports = (env) => {
                     },
                     { from: "LICENSE" }
                 ]
-            })
+            }),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development')
+            }),
         ],
         module: {
             rules: [

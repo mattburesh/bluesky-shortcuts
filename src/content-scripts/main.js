@@ -8,10 +8,13 @@ import * as css from "../../assets/style.css";
 
 class BlueSkyShortcuts {
     constructor() {
-        this.logger = new Logger();
+        this.logger = new Logger({
+            debugMode: process.env.NODE_ENV !== 'production',
+            prefix: '[BlueSky Shortcuts]',
+            logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn'
+        });
         this.appState = new AppState();
         this.shortcutsModal = new ShortcutsModal();
-
         this.appState.subscribe(this.handleStateChange.bind(this));
         this.initializeExtension();
         this.logger.debug('Extension initialized');
@@ -52,24 +55,34 @@ class BlueSkyShortcuts {
             clearTimeout(this._initializeTimeout);
         }
 
-        this._initializeTimeout = setTimeout(async () => {
-            try {
-                const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
-                const feedTabs = [...tabContainer.children].map(tab => ({
-                    element: tab,
-                    isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
-                }));
+        if (this._initializing) {
+            return;
+        }
+        this._initializing = true;
 
-                const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
+        try {
+            const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
+            const feedTabs = [...tabContainer.children].map(tab => ({
+                element: tab,
+                isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
+            }));
+            const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
+            const currentTabs = this.appState.state.feedTabs;
+            if (!currentTabs || 
+                currentTabs.length !== feedTabs.length || 
+                currentFeedIndex !== this.appState.state.currentFeedIndex) {
+                
                 this.appState.updateState({
                     feedTabs,
                     currentFeedIndex: currentFeedIndex === -1 ? 0 : currentFeedIndex
                 });
-            } catch (error) {
-                this.logger.error('Failed to initialize feed tabs', error);
-                throw error;
             }
-        }, 100);
+        } catch (error) {
+            this.logger.error('Failed to initialize feed tabs', error);
+            throw error;
+        } finally {
+            this._initializing = false;
+        }
     }
 
     setupShortcuts() {
