@@ -28,8 +28,6 @@ A browser extension for adding shortcuts to bsky.app.
 5. Enable `Developer mode` in the top right
 6. Click `Load unpacked` in the top left and select the `bsky-shortcuts/build` folder
 
-## Shortcuts 
-
 ## Shortcuts
 
 | Key                             | Action                             |
@@ -55,5 +53,6 @@ A browser extension for adding shortcuts to bsky.app.
 | <kbd>g</kbd> <kbd>s</kbd>       | Go to Settings                     |
 | <kbd>?</kbd>                    | Show Shortcuts                     |
 
-Changelog
+## Changelog
+
 See [CHANGELOG.md](CHANGELOG.md) for a complete list of changes.
