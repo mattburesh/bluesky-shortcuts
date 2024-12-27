@@ -378,21 +378,25 @@ class BlueSkyShortcuts {
         if (loadPostsButton) {
             loadPostsButton.click();
 
-            const { currentPost } = this.appState.state;
             this.appState.updateState({ currentPost: null });
 
             try {
-                if (this.currentController) {
-                    this.currentController.abort();
+                const { currentController } = this.appState.state;
+                if (currentController) {
+                    currentController.abort();
                 }
-                this.currentController = new AbortController();
-                await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, this.currentController.signal);
-                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const newController = new AbortController();
+                this.appState.updateState({ currentController: newController });
+
+                await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
+                await new Promise(resolve => setTimeout(resolve, 150));
 
                 const visiblePosts = DOMUtils.findVisiblePosts();
                 if (visiblePosts.length > 0) {
-                    this.appState.updateState({ currentPost: visiblePosts[0] });
-                    DOMUtils.safelyScrollIntoView(currentPost);
+                    const firstPost = visiblePosts[0];
+                    this.appState.updateState({ currentPost: firstPost });
+                    DOMUtils.safelyScrollIntoView(firstPost);
                 }
             } catch (error) {
                 if (error !== 'cancelled') {
