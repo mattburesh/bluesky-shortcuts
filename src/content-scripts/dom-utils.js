@@ -54,4 +54,22 @@ export default class DOMUtils {
             });
         }
     }
+
+    static findClosestVisiblePost(visiblePosts, currentPost, scrollY) {
+        return visiblePosts.reduce((closest, post) => {
+            const postTop = post.getBoundingClientRect().top + scrollY;
+            const closestTop = closest.getBoundingClientRect().top + scrollY;
+            return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
+        });
+    }
+
+    static findPostByCurrentPosition(visiblePosts, currentPost) {
+        const currentRect = currentPost.getBoundingClientRect();
+        return visiblePosts.reduce((closest, post) => {
+            const postRect = post.getBoundingClientRect();
+            const closestRect = closest.getBoundingClientRect();
+            return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top) 
+                ? post : closest;
+        });
+    }
 }

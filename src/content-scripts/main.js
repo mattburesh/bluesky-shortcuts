@@ -173,23 +173,11 @@ class BlueSkyShortcuts {
         let nextPost;
 
         if (!currentPost) {
-            const scrollY = window.scrollY;
-            nextPost = visiblePosts.reduce((closest, post) => {
-                const postTop = post.getBoundingClientRect().top + scrollY;
-                const closestTop = closest.getBoundingClientRect().top + scrollY;
-                return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
-            });
+            nextPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
-                // Current post not found in visible posts, find closest one
-                const currentRect = currentPost.getBoundingClientRect();
-                nextPost = visiblePosts.reduce((closest, post) => {
-                    const postRect = post.getBoundingClientRect();
-                    const closestRect = closest.getBoundingClientRect();
-                    return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top) 
-                        ? post : closest;
-                });
+                nextPost = DOMUtils.findPostByCurrentPosition(visiblePosts, currentPost);
             } else {
                 const nextIndex = Math.min(currentIndex + 1, visiblePosts.length - 1);
                 nextPost = visiblePosts[nextIndex];
@@ -212,23 +200,11 @@ class BlueSkyShortcuts {
         let prevPost;
 
         if (!currentPost) {
-            const scrollY = window.scrollY;
-            prevPost = visiblePosts.reduce((closest, post) => {
-                const postTop = post.getBoundingClientRect().top + scrollY;
-                const closestTop = closest.getBoundingClientRect().top + scrollY;
-                return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
-            });
+            prevPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
-                // Current post not found in visible posts, find closest one
-                const currentRect = currentPost.getBoundingClientRect();
-                prevPost = visiblePosts.reduce((closest, post) => {
-                    const postRect = post.getBoundingClientRect();
-                    const closestRect = closest.getBoundingClientRect();
-                    return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top) 
-                        ? post : closest;
-                });
+                prevPost = DOMUtils.findPostByCurrentPosition(visiblePosts, currentPost);
             } else {
                 const previousIndex = Math.max(currentIndex - 1, 0);
                 prevPost = visiblePosts[previousIndex];
