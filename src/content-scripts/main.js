@@ -173,11 +173,15 @@ class BlueSkyShortcuts {
         let nextPost;
 
         if (!currentPost) {
-            nextPost = visiblePosts[0];
+            nextPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
-            const nextIndex = Math.min(currentIndex + 1, visiblePosts.length - 1);
-            nextPost = visiblePosts[nextIndex];
+            if (currentIndex === -1) {
+                nextPost = DOMUtils.findPostByCurrentPosition(visiblePosts, currentPost);
+            } else {
+                const nextIndex = Math.min(currentIndex + 1, visiblePosts.length - 1);
+                nextPost = visiblePosts[nextIndex];
+            }
         }
 
         this.appState.updateState({ currentPost: nextPost });
@@ -196,11 +200,15 @@ class BlueSkyShortcuts {
         let prevPost;
 
         if (!currentPost) {
-            prevPost = visiblePosts[visiblePosts.length - 1];
+            prevPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
-            const previousIndex = Math.max(currentIndex - 1, 0);
-            prevPost = visiblePosts[previousIndex];
+            if (currentIndex === -1) {
+                prevPost = DOMUtils.findPostByCurrentPosition(visiblePosts, currentPost);
+            } else {
+                const previousIndex = Math.max(currentIndex - 1, 0);
+                prevPost = visiblePosts[previousIndex];
+            }
         }
 
         this.appState.updateState({ currentPost: prevPost });
