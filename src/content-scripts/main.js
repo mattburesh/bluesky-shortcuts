@@ -173,7 +173,6 @@ class BlueSkyShortcuts {
         let nextPost;
 
         if (!currentPost) {
-            // nextPost = visiblePosts[0];
             const scrollY = window.scrollY;
             nextPost = visiblePosts.reduce((closest, post) => {
                 const postTop = post.getBoundingClientRect().top + scrollY;
@@ -181,9 +180,6 @@ class BlueSkyShortcuts {
                 return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
             });
         } else {
-            // const currentIndex = visiblePosts.indexOf(currentPost);
-            // const nextIndex = Math.min(currentIndex + 1, visiblePosts.length - 1);
-            // nextPost = visiblePosts[nextIndex];
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
                 // Current post not found in visible posts, find closest one
@@ -216,7 +212,6 @@ class BlueSkyShortcuts {
         let prevPost;
 
         if (!currentPost) {
-            // prevPost = visiblePosts[visiblePosts.length - 1];
             const scrollY = window.scrollY;
             prevPost = visiblePosts.reduce((closest, post) => {
                 const postTop = post.getBoundingClientRect().top + scrollY;
@@ -224,9 +219,6 @@ class BlueSkyShortcuts {
                 return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
             });
         } else {
-            // const currentIndex = visiblePosts.indexOf(currentPost);
-            // const previousIndex = Math.max(currentIndex - 1, 0);
-            // prevPost = visiblePosts[previousIndex];
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
                 // Current post not found in visible posts, find closest one
