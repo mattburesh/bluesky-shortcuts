@@ -56,7 +56,8 @@ module.exports = (env) => {
                             return JSON.stringify(manifest, null, 2);
                         }
                     },
-                    { from: "LICENSE" }
+                    { from: "LICENSE" },
+                    { from: "assets/icons", to: "icons" },
                 ]
             }),
             new webpack.DefinePlugin({
