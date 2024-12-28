@@ -148,6 +148,10 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+.theme--dark .bsky-shortcuts-header {
+    color: #999;
+}
+
 .theme--dark .bsky-shortcut-key {
     background: #222;
     color: #fff;
@@ -179,6 +183,10 @@
     background: #1a1e2b;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.theme--dim .bsky-shortcuts-header {
+    color: #a1abc0;
 }
 
 .theme--dim .bsky-shortcut-key {
