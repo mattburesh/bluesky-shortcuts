@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.4] - 2024-12-28
+### Added
+- Added missing extension icons ([#35](https://github.com/mattburesh/bluesky-shortcuts/pull/35))
+
 ## [1.2.3] - 2024-12-27
 ### Added
 - Add state management system for better post tracking ([#32](https://github.com/mattburesh/bluesky-shortcuts/pull/32))
