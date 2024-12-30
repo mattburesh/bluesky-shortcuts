@@ -62,16 +62,22 @@ class BlueSkyShortcuts {
 
         try {
             const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
-            const feedTabs = [...tabContainer.children].map(tab => ({
-                element: tab,
-                isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
-            }));
-            const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
-            const currentTabs = this.appState.state.feedTabs;
-            if (!currentTabs || 
-                currentTabs.length !== feedTabs.length || 
-                currentFeedIndex !== this.appState.state.currentFeedIndex) {
-                
+            const feedTabs = [...tabContainer.children].map((tab, index) => {
+                if (!tab._hasClickListener) {
+                    tab.addEventListener('click', () => {
+                        this.handleFeedTabClick(index);
+                    });
+                    tab._hasClickListener = true;
+                }
+
+                return {
+                    element: tab,
+                    isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
+                };
+            });
+            // Only update the state if it hasn't been initialized yet
+            if (!this.appState.state.feedTabs?.length) {
+                const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
                 this.appState.updateState({
                     feedTabs,
                     currentFeedIndex: currentFeedIndex === -1 ? 0 : currentFeedIndex
@@ -291,6 +297,24 @@ class BlueSkyShortcuts {
             feedTabs: feedTabs.map((tab, i) => ({
                 ...tab,
                 isActive: i === newIndex
+            }))
+        });
+
+        this.waitForFeedLoad();
+    }
+
+    handleFeedTabClick(index) {
+        const { feedTabs } = this.appState.state;
+        if (index === this.appState.state.currentFeedIndex) {
+            return;
+        }
+
+        this.appState.updateState({
+            currentFeedIndex: index,
+            currentPost: null,
+            feedTabs: feedTabs.map((tab, i) => ({
+                ...tab,
+                isActive: i === index
             }))
         });
 
