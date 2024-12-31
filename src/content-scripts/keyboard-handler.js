@@ -62,4 +62,12 @@ export default class KeyboardShortcutManager {
     getActionForKey(keyCode) {
         return this.actionMap[keyCode];
     }
+
+    cleanup() {
+        document.removeEventListener('keydown', this.boundHandleKeyEvent);
+        if (this.prefixTimeout) {
+            clearTimeout(this.prefixTimeout);
+            this.prefixTimeout = null;
+        }
+    }
 }

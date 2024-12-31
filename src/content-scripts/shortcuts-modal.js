@@ -181,6 +181,13 @@ class ShortcutsModal {
             this.show();
         }
     }
+
+    cleanup() {
+        this.modalContainer?.remove();
+        if (this._escapeListener) {
+            document.removeEventListener('keydown', this._escapeListener);
+        }
+    }
 }
 
 export default ShortcutsModal;

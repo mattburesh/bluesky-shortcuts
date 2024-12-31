@@ -39,7 +39,11 @@ class AppState {
             if (currentPathname !== lastPathname) {
                 lastPathname = currentPathname;
                 lastUpdate = now;
-                this.updateState({ location: currentPathname });
+                this.updateState(prevState => ({
+                    ...prevState,
+                    location: currentPathname
+                }));
+                // this.updateState({ location: currentPathname });
             }
         });
 
