@@ -43,7 +43,6 @@ class AppState {
                     ...prevState,
                     location: currentPathname
                 }));
-                // this.updateState({ location: currentPathname });
             }
         });
 

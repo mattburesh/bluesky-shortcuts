@@ -185,7 +185,6 @@ class BlueSkyShortcuts {
 
             this.logger.debug('Navigating to:', path);
             
-            // window.history.pushState({}, '', `https://bsky.app${path}`);
             window.location.href = `https://bsky.app${path}`;
 
             this.handleNavigation(path);
@@ -421,15 +420,6 @@ class BlueSkyShortcuts {
     openPost() {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
-
-        // const timestampSelector = 'a[aria-label*=" at "]';
-        // const timestampLink = currentPost.querySelector(timestampSelector);
-        // if (timestampLink?.href?.includes('/post/')) {
-        //     timestampLink.click();
-        //     return;
-        // } else {
-        //     this.logger.warn('No valid post link found');
-        // }
 
         const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
 
