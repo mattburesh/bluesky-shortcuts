@@ -13,37 +13,47 @@ class BlueSkyShortcuts {
             prefix: '[BlueSky Shortcuts]',
             logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn'
         });
+
         this.appState = new AppState();
-        this.shortcutsModal = new ShortcutsModal();
-        this.appState.subscribe(this.handleStateChange.bind(this));
-        this.initializeExtension();
-        this.logger.debug('Extension initialized');
-
-        window.addEventListener('unload', () => {
-            this.appState.cleanup();
-        });
+        this.initialize().catch(error => {
+            this.logger.error('Failed to initialize extension: ', error);
+        })
     }
 
-    async handleStateChange(state) {
-        this.logger.debug('State changed:', state);
-        if (state.location === '/') {
-            await this.initializeFeedTabs();
-        }
-    }
-
-    async initializeExtension() {
+    async initialize() {
         try {
             await this.waitForAppLoad();
-            this.setupShortcuts();
-            this.shortcutsModal = new ShortcutsModal();
-            try {
+            this.logger.debug('App loaded, starting initialization');
+
+            await this.initializeComponents();
+
+            this.setupEventListeners();
+
+            if (window.location.pathname === '/') {
                 await this.initializeFeedTabs();
-            } catch (e) {
-                this.logger.debug('Feed tabs not found - likely on a page without a feed');
             }
+
+            this.logger.debug('Extension initialization complete');
         } catch (error) {
-            this.logger.error('Extension initialization failed', error);
+            this.logger.debug('Extension initialization failed', error);
+            throw error;
         }
+    }
+
+    async initializeComponents() {
+        this.shortcutsModal = new ShortcutsModal();
+
+        this.keyboardShortcutManager = new KeyboardShortcutManager(this.createActionMap());
+
+        this.appState.subscribe(this.handleStateChange.bind(this));
+    }
+
+    setupEventListeners() {
+        this.boundCleanup = () => this.cleanup();
+        this.boundHandleNavigation = () => this.handleNavigation(window.location.pathname);
+
+        window.addEventListener('unload', this.boundCleanup);
+        window.addEventListener('popstate', this.boundHandleNavigation);
     }
 
     async waitForAppLoad() {
@@ -91,8 +101,8 @@ class BlueSkyShortcuts {
         }
     }
 
-    setupShortcuts() {
-        const actionMap = {
+    createActionMap() {
+        return {
             [config.shortcuts.nextPost]: {
                 action: this.moveToNextPost.bind(this)
             },
@@ -130,25 +140,25 @@ class BlueSkyShortcuts {
                 allowedModifiers: ['shift']
             },
             [config.shortcuts.goHome]: {
-                action: () => window.location.href = 'https://bsky.app/'
+                action: () => this.navigateTo('/')
             },
             [config.shortcuts.goProfile]: {
                 action: this.goHome.bind(this)
             },
             [config.shortcuts.goNotifications]: {
-                action: () => window.location.href = 'https://bsky.app/notifications'
+                action: () => this.navigateTo('/notifications')
             },
             [config.shortcuts.goChat]: {
-                action: () => window.location.href = 'https://bsky.app/messages'
+                action: () => this.navigateTo('/messages')
             },
             [config.shortcuts.goFeeds]: {
-                action: () => window.location.href = 'https://bsky.app/feeds'
+                action: () => this.navigateTo('/feeds')
             },
             [config.shortcuts.goLists]: {
-                action: () => window.location.href = 'https://bsky.app/lists'
+                action: () => this.navigateTo('/lists')
             },
             [config.shortcuts.goSettings]: {
-                action: () => window.location.href = 'https://bsky.app/settings'
+                action: () => this.navigateTo('/settings')
             },
             [config.shortcuts.hidePost]: {
                 action: () => this.handleOptionsAction('hide post', 'postDropdownHideBtn')
@@ -163,8 +173,50 @@ class BlueSkyShortcuts {
                 action: () => this.handleOptionsAction('copy post text', 'postDropdownCopyTextBtn')
             },
         };
+    }
 
-        new KeyboardShortcutManager(actionMap);
+    navigateTo(path) {
+        try {
+            const currentPath = window.location.pathname;
+            if (currentPath === path) {
+                this.logger.debug('Already on path:', path);
+                return;
+            }
+
+            this.logger.debug('Navigating to:', path);
+            
+            window.location.href = `https://bsky.app${path}`;
+
+            this.handleNavigation(path);
+        } catch (error) {
+            this.logger.error('Navigation failed: ', error);
+        }
+    }
+
+    async handleStateChange(state) {
+        this.logger.debug('State changed:', state);
+    }
+
+    handleNavigation(newPath) {
+        this.logger.debug('Navigation occurred to:', newPath);
+
+        if (this.appState.state.currentController) {
+            this.appState.state.currentController.abort();
+        }
+
+        const isFeedView = newPath === '/' || newPath.startsWith('/profile/');
+
+        this.appState.updateState({ 
+            location: newPath,
+            currentController: null,
+            ...(isFeedView ? {} : { currentPost: null })
+        });
+
+        if (newPath === '/') {
+            this.initializeFeedTabs().catch(error => {
+                this.logger.error('Failed to initialize feed tabs after navigation', error);
+            });
+        }
     }
 
     moveToNextPost() {
@@ -285,12 +337,12 @@ class BlueSkyShortcuts {
         const direction = event.shiftKey ? -1 : 1;
         const newIndex = (currentFeedIndex + direction + feedTabs.length) % feedTabs.length;
         const targetTab = feedTabs[newIndex];
+        
         if (!targetTab?.element) {
             this.logger.error('Invalid feed tab');
             return;
         }
 
-        targetTab.element.click();
         this.appState.updateState({
             currentFeedIndex: newIndex,
             currentPost: null,
@@ -300,7 +352,11 @@ class BlueSkyShortcuts {
             }))
         });
 
-        this.waitForFeedLoad();
+        const loadPromise = this.waitForFeedLoad();
+
+        targetTab.element.click();
+
+        return loadPromise;
     }
 
     handleFeedTabClick(index) {
@@ -318,7 +374,7 @@ class BlueSkyShortcuts {
             }))
         });
 
-        this.waitForFeedLoad();
+        return this.waitForFeedLoad();
     }
 
     waitForFeedLoad() {
@@ -331,16 +387,34 @@ class BlueSkyShortcuts {
         const controller = new AbortController();
         this.appState.updateState({ currentController: controller });
 
-        DOMUtils.waitForElement(feedSelector, 5000, controller.signal)
+        return new Promise((resolve, reject) => {
+            DOMUtils.waitForElement(feedSelector, 5000, controller.signal)
+            .then(feed => {
+                return new Promise(r => setTimeout(r, 100))
+                    .then(() => feed);
+            })
             .then(feed => {
                 const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
-                this.appState.updateState({ currentPost: firstPost });
+                if (firstPost) {
+                    this.appState.updateState({ currentPost: firstPost });
+                    resolve(firstPost);
+                } else {
+                    reject(new Error('No posts found after feed load'));
+                }
             })
             .catch(error => {
                 if (error !== 'cancelled') {
                     this.logger.error('Failed to load feed', error);
+                    reject(error);
                 }
             });
+        });
+
+
+
+        
+
+            
     }
 
     openPost() {
@@ -471,6 +545,19 @@ class BlueSkyShortcuts {
 
         optionsButton.click();
         return true;
+    }
+
+    cleanup() {
+        this.logger.debug('Starting cleanup');
+
+        this.appState.cleanup();
+        this.keyboardShortcutManager?.cleanup();
+        this.shortcutsModal?.cleanup();
+
+        window.removeEventListener('unload', this.boundCleanup);
+        window.removeEventListener('popstate', this.boundHandleNavigation);
+
+        this.logger.debug('Cleanup complete');
     }
 }
 
