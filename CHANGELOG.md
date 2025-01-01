@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2024-12-31
+### Added
+- Refactor initialization lifecycle for greater consistency ([#36](https://github.com/mattburesh/bluesky-shortcuts/pull/36))
+### Fixed
+- Fix clicking on feed not updating state ([37](https://github.com/mattburesh/bluesky-shortcuts/pull/37))
+
 ## [1.2.4] - 2024-12-28
 ### Added
 - Added missing extension icons ([#35](https://github.com/mattburesh/bluesky-shortcuts/pull/35))
