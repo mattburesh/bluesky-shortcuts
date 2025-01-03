@@ -35,7 +35,8 @@ class ShortcutsModal {
             { key: 'g c', description: 'Go to Chat' },
             { key: 'g f', description: 'Go to Feeds' },
             { key: 'g l', description: 'Go to Lists' },
-            { key: 'g s', description: 'Go to Settings' }
+            { key: 'g s', description: 'Go to Settings' },
+            { key: 'g u', description: 'Go to User Profile' }
         ];
 
         this.initialize();

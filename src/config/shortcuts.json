@@ -15,6 +15,7 @@
 
         "goHome": "gh",
         "goProfile": "gp",
+        "goUserProfile": "gu",
         "goNotifications": "gn",
         "goChat": "gc",
         "goFeeds": "gf",
