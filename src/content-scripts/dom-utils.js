@@ -59,9 +59,12 @@ export default class DOMUtils {
         if (element) {
             document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
                 el.classList.remove('bsky-highlighted-post');
+                el.removeAttribute('tabindex');
             });
 
             element.classList.add('bsky-highlighted-post');
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('aria-label', 'Current post');
 
             element.scrollIntoView({
                 behavior: 'smooth',
@@ -69,6 +72,10 @@ export default class DOMUtils {
                 inline: 'nearest',
                 ...options
             });
+
+            if (!element.contains(document.activeElement)) {
+                element.focus({ preventScroll: true });
+            }
         }
     }
 

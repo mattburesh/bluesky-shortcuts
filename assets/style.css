@@ -1,7 +1,32 @@
+/**
+ * CSS for active post
+ */
+
 .bsky-highlighted-post {
     border: 2px solid #0070FF;
     transition: border 0.2s ease;
+    outline: none;
 }
+
+.bsky-highlighted-post:focus {
+    border-color: #0070FF;
+    box-shadow: 0 0 0 2px rgba(0, 112, 255, 0.4);
+}
+
+.bsky-highlighted-post a,
+.bsky-highlighted-post button {
+    outline: none;
+}
+
+.bsky-highlighted-post a:focus,
+.bsky-highlighted-post button:focus {
+    outline: 2px solid #0070FF;
+    outline-offset: 2px;
+}
+
+/**
+ * CSS for shortcuts modal window
+ */
 
 .bsky-shortcut-keys {
     display: flex;
