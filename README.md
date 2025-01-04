@@ -46,7 +46,8 @@ A browser extension for adding shortcuts to bsky.app.
 | <kbd>/</kbd>                    | Focus Search                       |
 | <kbd>g</kbd> <kbd>h</kbd>       | Go to Home                         |
 | <kbd>g</kbd> <kbd>p</kbd>       | Go to Profile                      |
-| <kbd>g</kbd> <kbd>n             | Go to Notifications                |
+| <kbd>g</kbd> <kbd>u</kbd>       | Go to post author profile          |
+| <kbd>g</kbd> <kbd>n</kbd>       | Go to Notifications                |
 | <kbd>g</kbd> <kbd>c</kbd>       | Go to Chat                         |
 | <kbd>g</kbd> <kbd>f</kbd>       | Go to Feeds                        |
 | <kbd>g</kbd> <kbd>l</kbd>       | Go to Lists                        |
