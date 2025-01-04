@@ -1,27 +1,44 @@
 export default class DOMUtils {
-    static waitForElement(selector, timeout = 5000, signal) {
-        return new Promise((resolve, reject) => {
-            const startTime = Date.now();
+    static async waitForElement(selector, timeout = 5000, signal, retryOptions = { maxRetries: 3, retryDelay: 2000 }) {
+        let retryCount = 0;
 
-            const checkForElement = () => {
-                if (signal?.aborted) {
-                    reject('cancelled');
-                    return;
+        const attempt = async () => {
+            try {
+                return await new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+
+                    const checkForElement = () => {
+                        if (signal?.aborted) {
+                            reject('cancelled');
+                            return;
+                        }
+        
+                        const element = document.querySelector(selector);
+                        
+                        if (element) {
+                            resolve(element);
+                        } else if (Date.now() - startTime > timeout) {
+                            reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+                        } else {
+                            requestAnimationFrame(checkForElement);
+                        }
+                    };
+
+                    checkForElement();
+                });
+            } catch (error) {
+                if (error === 'cancelled' || retryCount >= retryOptions.maxRetries) {
+                    throw error;
                 }
-
-                const element = document.querySelector(selector);
                 
-                if (element) {
-                    resolve(element);
-                } else if (Date.now() - startTime > timeout) {
-                    reject(new Error(`Element ${selector} not found within ${timeout}ms`));
-                } else {
-                    requestAnimationFrame(checkForElement);
-                }
-            };
+                retryCount++;
+                console.log('retry ' + retryCount );
+                await new Promise(resolve => setTimeout(resolve, retryOptions.retryDelay));
+                return attempt();
+            }
+        }
 
-            checkForElement();
-        });
+        return attempt();
     }
 
     /**
