@@ -143,7 +143,10 @@ class BlueSkyShortcuts {
                 action: () => this.navigateTo('/')
             },
             [config.shortcuts.goProfile]: {
-                action: this.goHome.bind(this)
+                action: this.goProfile.bind(this)
+            },
+            [config.shortcuts.goUserProfile]: {
+                action: this.goUserProfile.bind(this)
             },
             [config.shortcuts.goNotifications]: {
                 action: () => this.navigateTo('/notifications')
@@ -171,7 +174,7 @@ class BlueSkyShortcuts {
             },
             [config.shortcuts.copyPostText]: {
                 action: () => this.handleOptionsAction('copy post text', 'postDropdownCopyTextBtn')
-            },
+            }
         };
     }
 
@@ -408,13 +411,7 @@ class BlueSkyShortcuts {
                     reject(error);
                 }
             });
-        });
-
-
-
-        
-
-            
+        }); 
     }
 
     openPost() {
@@ -504,10 +501,34 @@ class BlueSkyShortcuts {
         }
     }
 
-    goHome() {
+    goProfile() {
         const profileLink = document.querySelector('[aria-label="Profile"][role="link"]');
         if (profileLink) {
             profileLink.click();
+        }
+    }
+
+    goUserProfile() {
+        const { currentPost } = this.appState.state;
+        console.log('go to profile');
+
+        try {
+            if (currentPost) {
+                const isRepost = currentPost.querySelector('[aria-label*="Reposted by"]') !== null;
+                const profileLinks = currentPost.querySelectorAll('a[href*="/profile/"]');
+                const authorLink = isRepost ? profileLinks[1] : profileLinks[0];
+
+                if (authorLink) {
+                    this.logger.debug('Found author profile link:', authorLink.href);
+                    authorLink.click();
+                    return;
+                }
+                this.logger.debug('No author profile link found in current post');
+            }
+
+            this.logger.debug('No author profile link found in current post');
+        } catch (error) {
+            this.logger.error('Error opening user profile', error);
         }
     }
 
