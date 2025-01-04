@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.0] - 2025-01-03
+### Added
+- Add retry mechanism to element detection ([#38](https://github.com/mattburesh/bluesky-shortcuts/pull/38))
+- Add 'gu' shortcut to open post author profile ([#39](https://github.com/mattburesh/bluesky-shortcuts/pull/39))
+
 ## [1.3.0] - 2024-12-31
 ### Added
 - Refactor initialization lifecycle for greater consistency ([#36](https://github.com/mattburesh/bluesky-shortcuts/pull/36))
