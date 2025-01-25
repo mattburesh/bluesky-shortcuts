@@ -643,7 +643,7 @@ class BlueSkyShortcuts {
         highlightedLink.forEach(element => {
             element.classList.remove('bsky-highlighted-link');
         })
-        currentPost.focus();
+        // currentPost.focus();
     }
 
     cleanup() {
