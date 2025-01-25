@@ -1,6 +1,15 @@
+[data-testid*="feedItem-by-"]:focus,
+[data-testid*="postThreadItem-by-"]:focus,
 .bsky-highlighted-post {
-    border: 2px solid #0070FF;
-    transition: border 0.2s ease;
+    outline: none;
+    box-shadow: 0 0 0 2px #0070FF;
+    border-radius: 4px;
+    position: relative;
+}
+
+.bsky-highlighted-link {
+    outline: 2px solid #0070FF !important;
+    border-radius: 2px;
 }
 
 .bsky-shortcut-keys {
