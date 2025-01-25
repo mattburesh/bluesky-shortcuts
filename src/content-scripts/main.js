@@ -123,6 +123,10 @@ class BlueSkyShortcuts {
                 action: this.cycleFeed.bind(this),
                 allowedModifiers: ['shift']
             },
+            [config.shortcuts.cycleLink]: {
+                action: this.cycleLink.bind(this),
+                allowedModifiers: ['shift']
+            },
             [config.shortcuts.openPost]: {
                 action: this.openPost.bind(this)
             },
@@ -245,7 +249,8 @@ class BlueSkyShortcuts {
             }
         }
 
-        this.appState.updateState({ currentPost: nextPost });
+        this.appState.updateState({ currentPost: nextPost, currentLinkIndex: -1 });
+        this.resetFocus();
         DOMUtils.safelyScrollIntoView(nextPost);
     }
 
@@ -272,7 +277,8 @@ class BlueSkyShortcuts {
             }
         }
 
-        this.appState.updateState({ currentPost: prevPost });
+        this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
+        this.resetFocus();
         DOMUtils.safelyScrollIntoView(prevPost);
     }
 
@@ -362,6 +368,47 @@ class BlueSkyShortcuts {
         return loadPromise;
     }
 
+    cycleLink(event) {
+        const { currentPost, currentLinkIndex } = this.appState.state;
+        if (!currentPost) return;
+
+        this.logger.debug('Cylcling links');
+
+        document.querySelectorAll('.bsky-highlighted-link').forEach(el => {
+            el.classList.remove('bsky-highlighted-link');
+        });
+
+        const postContent = currentPost.querySelector('[data-testid*="postText"]');
+        if (!postContent) {
+            this.logger.debug('No post content found.');
+            return;
+        }
+
+        const links = [...postContent.querySelectorAll('a[role="link"]')];
+        if (!links.length) {
+            this.logger.debug('No links found in post.');
+            return;
+        }
+
+        const direction = event.shiftKey ? -1 : 1;
+        let newIndex = currentLinkIndex + direction;
+
+        if (newIndex >= links.length) newIndex = -1;
+        if (newIndex < -1) newIndex = links.length -1;
+
+        if (newIndex === -1) {
+            this.appState.updateState({ currentLinkIndex: -1 });
+            currentPost.focus();
+        } else {
+            const targetLink = links[newIndex];
+            if (targetLink) {
+                targetLink.classList.add('bsky-highlighted-link');
+                targetLink.focus();
+                this.appState.updateState({ currentLinkIndex: newIndex });
+            }
+        }
+    }
+
     handleFeedTabClick(index) {
         const { feedTabs } = this.appState.state;
         if (index === this.appState.state.currentFeedIndex) {
@@ -415,8 +462,30 @@ class BlueSkyShortcuts {
     }
 
     openPost() {
-        const { currentPost } = this.appState.state;
+        const { currentPost, currentLinkIndex } = this.appState.state;
         if (!currentPost) return;
+
+        // if a link is focused, open it instead of the post
+        if (currentLinkIndex !== -1) {
+            const postContent = currentPost.querySelector('[data-testid*="postText"]');
+            if (postContent) {
+                const links = [...postContent.querySelectorAll('a[role="link"]')];
+                const targetLink = links[currentLinkIndex];
+                if (targetLink) {
+                    targetLink.click();
+                    targetLink.classList.remove('bsky-highlighted-link');
+                    this.appState.updateState({ currentLinkIndex: -1 });
+                    return;
+                }
+            }
+        }
+
+        const highlightedLink = currentPost.querySelector('.bsky-highlighted-link');
+        if (highlightedLink) {
+            highlightedLink.click();
+            highlightedLink.classList.remove('bsky-highlighted-link');
+            return;
+        }
 
         const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
 
@@ -566,6 +635,15 @@ class BlueSkyShortcuts {
 
         optionsButton.click();
         return true;
+    }
+
+    resetFocus() {
+        const { currentPost } = this.appState.state;
+        const highlightedLink = document.querySelectorAll('.bsky-highlighted-link');
+        highlightedLink.forEach(element => {
+            element.classList.remove('bsky-highlighted-link');
+        })
+        currentPost.focus();
     }
 
     cleanup() {

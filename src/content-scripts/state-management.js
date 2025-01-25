@@ -6,6 +6,7 @@ class AppState {
             feedTabs: [],
             currentFeedIndex: 0,
             currentPost: null,
+            currentLinkIndex: -1, // -1 = open selected post, n = open nth link in post
             currentController: null,
             location: window.location.pathname
         };

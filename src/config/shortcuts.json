@@ -6,6 +6,7 @@
         "replyToPost": "r",
         "repostPost": "t",
         "cycleFeed": "c",
+        "cycleLink": "v",
         "newPost": "n",
         "expandPhoto": "o",
         "openPost": "Enter",
