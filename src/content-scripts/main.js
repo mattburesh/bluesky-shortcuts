@@ -249,8 +249,8 @@ class BlueSkyShortcuts {
             }
         }
 
-        this.appState.updateState({ currentPost: nextPost, currentLinkIndex: -1 });
         this.resetFocus();
+        this.appState.updateState({ currentPost: nextPost, currentLinkIndex: -1 });
         DOMUtils.safelyScrollIntoView(nextPost);
     }
 
@@ -277,8 +277,8 @@ class BlueSkyShortcuts {
             }
         }
 
-        this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
         this.resetFocus();
+        this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
         DOMUtils.safelyScrollIntoView(prevPost);
     }
 
@@ -378,13 +378,23 @@ class BlueSkyShortcuts {
             el.classList.remove('bsky-highlighted-link');
         });
 
-        const postContent = currentPost.querySelector('[data-testid*="postText"]');
-        if (!postContent) {
-            this.logger.debug('No post content found.');
-            return;
-        }
+        const contentSelectors = [
+            '[data-testid*="postText"]',
+            '[data-testid*="postThreadItem-by-"] > div:last-child > div:last-child > div:nth-child(2)'
+        ]
 
-        const links = [...postContent.querySelectorAll('a[role="link"]')];
+        /**
+        * Find all links within a post's content area.
+        * Uses contentSelectors to target both feed posts and thread posts.
+        * Returns first non-empty array of links found, or an empty array if none exist.
+        */
+        const links = contentSelectors
+            .reduce((foundLinks, selector) => {
+                if (foundLinks.length) return foundLinks;
+                const content = currentPost.querySelector(selector);
+                return content ? [...content.querySelectorAll('a[role="link"][href]')] : [];
+            }, []);
+
         if (!links.length) {
             this.logger.debug('No links found in post.');
             return;
@@ -482,6 +492,7 @@ class BlueSkyShortcuts {
 
         const highlightedLink = currentPost.querySelector('.bsky-highlighted-link');
         if (highlightedLink) {
+            this.resetFocus();
             highlightedLink.click();
             highlightedLink.classList.remove('bsky-highlighted-link');
             return;
@@ -642,8 +653,12 @@ class BlueSkyShortcuts {
         const highlightedLink = document.querySelectorAll('.bsky-highlighted-link');
         highlightedLink.forEach(element => {
             element.classList.remove('bsky-highlighted-link');
+            element.blur();
         })
-        // currentPost.focus();
+
+        document.querySelectorAll('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]').forEach(post => {
+            post.blur();
+        });
     }
 
     cleanup() {

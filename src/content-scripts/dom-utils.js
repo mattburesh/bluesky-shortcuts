@@ -62,7 +62,6 @@ export default class DOMUtils {
             });
 
             element.classList.add('bsky-highlighted-post');
-            // element.focus({ preventScroll: true });
             element.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
