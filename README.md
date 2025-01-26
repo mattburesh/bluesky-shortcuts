@@ -47,6 +47,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 | <kbd>o</kbd>                    | Expand Image                       |
 | <kbd>c</kbd>                    | Cycle Forward Through Saved Feeds  |
 | <kbd>Shift</kbd> + <kbd>c</kbd> | Cycle Backward Through Saved Feeds |
+| <kbd>v</kbd>                    | Select next link in post           |
+| <kbd>Shift</kbd> + <kbd>v</kbd> | Select next previous link in post  |
 | <kbd>/</kbd>                    | Focus Search                       |
 | <kbd>g</kbd> <kbd>h</kbd>       | Go to Home                         |
 | <kbd>g</kbd> <kbd>p</kbd>       | Go to Profile                      |
