@@ -215,12 +215,9 @@ class BlueSkyShortcuts {
         this.appState.updateState({ 
             location: newPath,
             currentController: null,
-            // currentPost: null,
-            // currentLinkIndex: -1
             ...(isFeedView ? {} : { currentPost: null, currentLinkIndex: -1 })
         });
 
-        // selectNearestVisiblePost
         if (newPath === '/') {
             this.initializeFeedTabs().catch(error => {
                 this.logger.error('Failed to initialize feed tabs after navigation', error);
@@ -246,7 +243,6 @@ class BlueSkyShortcuts {
         let nextPost;
 
         if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
-            // nextPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
             nextPost = visiblePosts[0]
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
@@ -275,7 +271,6 @@ class BlueSkyShortcuts {
         let prevPost;
 
         if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
-            // prevPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
             prevPost = visiblePosts[0]
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
@@ -720,12 +715,6 @@ class BlueSkyShortcuts {
         document.querySelectorAll('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]').forEach(post => {
             post.blur();
         });
-
-        // if (document.activeElement && document.activeElement !== document.body) {
-        //     document.activeElement.blur();
-        // }
-
-        // document.body.focus();
     }
 
     cleanup() {
