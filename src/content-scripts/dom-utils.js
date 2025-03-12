@@ -55,36 +55,47 @@ export default class DOMUtils {
         return feedItems;
     }
 
-    static safelyScrollIntoView(element, options = {}) {
-        if (element) {
-            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
-                el.classList.remove('bsky-highlighted-post');
-            });
-
-            element.classList.add('bsky-highlighted-post');
-
-            const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
-            const headerOffset = header ? header.offsetHeight + 12 : 60;
-            
-            // try to center the post if there is enough space to do so
-            const elementRect = element.getBoundingClientRect();
-            const elementHeight = elementRect.height;
-            const viewportHeight = window.innerHeight;
-            const availableHeight = viewportHeight - headerOffset;
-            const centerPosition = window.pageYOffset + elementRect.top - headerOffset - (availableHeight / 2 - elementHeight / 2);
-
-            window.scrollTo({
-                top: Math.max(0, centerPosition),
-                behavior: options.behavior || 'smooth'
-            });
-        }
-    }
-
-    static findClosestVisiblePost(visiblePosts, currentPost, scrollY) {
+    static findClosestVisiblePost(visiblePosts, scrollY) {
         return visiblePosts.reduce((closest, post) => {
             const postTop = post.getBoundingClientRect().top + scrollY;
             const closestTop = closest.getBoundingClientRect().top + scrollY;
             return Math.abs(postTop - scrollY) < Math.abs(closestTop - scrollY) ? post : closest;
+        });
+    }
+
+    static safelyScrollIntoView(element, options = {}) {
+        if (!element) return;
+
+        document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+            el.classList.remove('bsky-highlighted-post');
+        });
+
+        element.classList.add('bsky-highlighted-post');
+
+        if (options.skipScroll) {
+            return;
+        }
+
+        const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
+        const headerOffset = header ? header.offsetHeight + 12 : 60;
+        
+        // try to center the post if there is enough space to do so
+        const elementRect = element.getBoundingClientRect();
+        const elementHeight = elementRect.height;
+        const viewportHeight = window.innerHeight;
+        
+        const availableHeight = viewportHeight - headerOffset;
+
+        let scrollPosition;
+
+        if (elementHeight > availableHeight) {
+            scrollPosition = window.pageYOffset + elementRect.top - headerOffset;
+        } else {
+            scrollPosition = window.pageYOffset + elementRect.top - headerOffset - (availableHeight / 2 - elementHeight / 2);
+        }
+        window.scrollTo({
+            top: Math.max(0, scrollPosition),
+            behavior: options.behavior || 'smooth'
         });
     }
 
@@ -96,5 +107,11 @@ export default class DOMUtils {
             return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top) 
                 ? post : closest;
         });
+    }
+
+    static isValidElement(element) {
+        return element && 
+               element.isConnected &&
+               element.offsetParent != null
     }
 }

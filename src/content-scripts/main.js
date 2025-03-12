@@ -212,18 +212,26 @@ class BlueSkyShortcuts {
         }
 
         const isFeedView = newPath === '/' || newPath.startsWith('/profile/');
-
         this.appState.updateState({ 
             location: newPath,
             currentController: null,
-            ...(isFeedView ? {} : { currentPost: null })
+            // currentPost: null,
+            // currentLinkIndex: -1
+            ...(isFeedView ? {} : { currentPost: null, currentLinkIndex: -1 })
         });
 
+        // selectNearestVisiblePost
         if (newPath === '/') {
             this.initializeFeedTabs().catch(error => {
                 this.logger.error('Failed to initialize feed tabs after navigation', error);
             });
         }
+
+        setTimeout(() => {
+            this.selectNearestVisiblePost().catch(error => {
+                    this.logger.error('Failed to select nearest post', error);
+                });
+        }, 50);
     }
 
     moveToNextPost() {
@@ -237,8 +245,9 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         let nextPost;
 
-        if (!currentPost) {
-            nextPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
+        if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
+            // nextPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
+            nextPost = visiblePosts[0]
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
@@ -265,8 +274,9 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         let prevPost;
 
-        if (!currentPost) {
-            prevPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
+        if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
+            // prevPost = DOMUtils.findClosestVisiblePost(visiblePosts, window.scrollY);
+            prevPost = visiblePosts[0]
         } else {
             const currentIndex = visiblePosts.indexOf(currentPost);
             if (currentIndex === -1) {
@@ -280,6 +290,52 @@ class BlueSkyShortcuts {
         this.resetFocus();
         this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
         DOMUtils.safelyScrollIntoView(prevPost);
+    }
+
+    async selectNearestVisiblePost() {
+        try {
+            const visiblePosts = DOMUtils.findVisiblePosts();
+            if (!visiblePosts.length) {
+                this.logger.warn('No visible posts found');
+                return null
+            }
+
+            // Get viewport dimensions
+            const viewportHeight = window.innerHeight;
+            const scrollTop = window.scrollY;
+            const viewportCenter = scrollTop + (viewportHeight / 2);
+            
+            // Find post closest to the center of the viewport
+            let targetPost = visiblePosts.reduce((closest, post) => {
+                const rect = post.getBoundingClientRect();
+                const postCenter = rect.top + (rect.height / 2) + window.scrollY;
+                
+                if (!closest) return post;
+                
+                const closestCenter = closest.getBoundingClientRect().top + 
+                                    (closest.getBoundingClientRect().height / 2) + 
+                                    window.scrollY;
+                
+                // Use distance to viewport center as the metric
+                return Math.abs(postCenter - viewportCenter) < 
+                    Math.abs(closestCenter - viewportCenter) ? post : closest;
+            }, null);
+
+            if (targetPost) {
+                this.resetFocus();
+                this.appState.updateState({
+                    currentPost: targetPost,
+                    currentLinkIndex: -1
+                });
+
+                DOMUtils.safelyScrollIntoView(targetPost, { skipScroll: true });
+                return targetPost;
+            }
+        } catch (error) {
+            this.logger.error('Failed to select first visible post', error);
+        }
+
+        return null;
     }
 
     likePost() {
@@ -473,7 +529,11 @@ class BlueSkyShortcuts {
 
     openPost() {
         const { currentPost, currentLinkIndex } = this.appState.state;
-        if (!currentPost) return;
+
+        if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
+            this.logger.debug('No valid current post, attempting to select first visible post');
+            return this.selectFirstVisiblePost();
+        }
 
         // if a link is focused, open it instead of the post
         if (currentLinkIndex !== -1) {
@@ -505,6 +565,9 @@ class BlueSkyShortcuts {
         );
 
         if (postLink) {
+            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+                el.classList.remove('bsky-highlighted-post');
+            });
             postLink.click();
         } else {
             this.logger.warn('No valid post link found');
@@ -649,9 +712,7 @@ class BlueSkyShortcuts {
     }
 
     resetFocus() {
-        const { currentPost } = this.appState.state;
-        const highlightedLink = document.querySelectorAll('.bsky-highlighted-link');
-        highlightedLink.forEach(element => {
+        document.querySelectorAll('.bsky-highlighted-link').forEach(element => {
             element.classList.remove('bsky-highlighted-link');
             element.blur();
         })
@@ -659,6 +720,12 @@ class BlueSkyShortcuts {
         document.querySelectorAll('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]').forEach(post => {
             post.blur();
         });
+
+        // if (document.activeElement && document.activeElement !== document.body) {
+        //     document.activeElement.blur();
+        // }
+
+        // document.body.focus();
     }
 
     cleanup() {
