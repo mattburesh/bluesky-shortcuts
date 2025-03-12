@@ -68,9 +68,41 @@ export default class DOMUtils {
 
         document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
             el.classList.remove('bsky-highlighted-post');
+
+            if (el.__bskyEnterHandler) {
+                el.removeEventListener('keydown', el.__bskyEnterHandler);
+                el.__bskyEnterHandler = null;
+            }
+
+            if (el.getAttribute('data-bsky-temp-tabindex') === 'true') {
+                el.removeAttribute('tabindex');
+                el.removeAttribute('data-bsky-temp-tabindex');
+            }
         });
 
         element.classList.add('bsky-highlighted-post');
+        if (element.getAttribute('tabindex') === null) {
+            element.setAttribute('tabindex', '0');
+            element.setAttribute('data-bsky-temp-tabindex', 'true');
+        }
+
+        element.__bskyEnterHandler = function(e) {
+            if (e.key === 'Enter') {
+                // Stop event propagation to prevent conflicts
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Find and execute the openPost action from our main keyboard handler
+                const shortcutInstance = window.__bskyShortcuts;
+                if (shortcutInstance) {
+                    shortcutInstance.openPost();
+                }
+                
+                return false;
+            }
+        };
+        element.addEventListener('keydown', element.__bskyEnterHandler);
+        element.focus({ preventScroll: true });
 
         if (options.skipScroll) {
             return;

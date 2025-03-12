@@ -8,10 +8,21 @@
     transition: box-shadow 0.2s ease-in-out;
 }
 
+[data-testid*="feedItem-by-"]:focus-visible,
+[data-testid*="postThreadItem-by-"]:focus-visible {
+    outline: none;
+}
+
+[data-testid*="feedItem-by-"]:focus.bsky-highlighted-post,
+[data-testid*="postThreadItem-by-"]:focus.bsky-highlighted-post {
+    box-shadow: 0 0 0 2px #0070FF;
+}
+
 [data-testid*="feedItem-by-"],
 [data-testid*="postThreadItem-by-"] {
     transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-out;
     scroll-margin-top: 60px;
+    outline-offset: -2px;
 }
 
 .bsky-highlighted-post {

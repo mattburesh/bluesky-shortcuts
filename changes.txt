@@ -1,0 +1,302 @@
+diff --git a/assets/style.css b/assets/style.css
+index 8641cf5..80b1b1b 100644
+--- a/assets/style.css
++++ b/assets/style.css
+@@ -8,10 +8,21 @@
+     transition: box-shadow 0.2s ease-in-out;
+ }
+ 
++[data-testid*="feedItem-by-"]:focus-visible,
++[data-testid*="postThreadItem-by-"]:focus-visible {
++    outline: none;
++}
++
++[data-testid*="feedItem-by-"]:focus.bsky-highlighted-post,
++[data-testid*="postThreadItem-by-"]:focus.bsky-highlighted-post {
++    box-shadow: 0 0 0 2px #0070FF;
++}
++
+ [data-testid*="feedItem-by-"],
+ [data-testid*="postThreadItem-by-"] {
+     transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-out;
+     scroll-margin-top: 60px;
++    outline-offset: -2px;
+ }
+ 
+ .bsky-highlighted-post {
+diff --git a/src/content-scripts/dom-utils.js b/src/content-scripts/dom-utils.js
+index 501b0fd..3f3e2b3 100644
+--- a/src/content-scripts/dom-utils.js
++++ b/src/content-scripts/dom-utils.js
+@@ -68,9 +68,41 @@ export default class DOMUtils {
+ 
+         document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+             el.classList.remove('bsky-highlighted-post');
++
++            if (el.__bskyEnterHandler) {
++                el.removeEventListener('keydown', el.__bskyEnterHandler);
++                el.__bskyEnterHandler = null;
++            }
++
++            if (el.getAttribute('data-bsky-temp-tabindex') === 'true') {
++                el.removeAttribute('tabindex');
++                el.removeAttribute('data-bsky-temp-tabindex');
++            }
+         });
+ 
+         element.classList.add('bsky-highlighted-post');
++        if (element.getAttribute('tabindex') === null) {
++            element.setAttribute('tabindex', '0');
++            element.setAttribute('data-bsky-temp-tabindex', 'true');
++        }
++
++        element.__bskyEnterHandler = function(e) {
++            if (e.key === 'Enter') {
++                // Stop event propagation to prevent conflicts
++                e.preventDefault();
++                e.stopPropagation();
++                
++                // Find and execute the openPost action from our main keyboard handler
++                const shortcutInstance = window.__bskyShortcuts;
++                if (shortcutInstance) {
++                    shortcutInstance.openPost();
++                }
++                
++                return false;
++            }
++        };
++        element.addEventListener('keydown', element.__bskyEnterHandler);
++        element.focus({ preventScroll: true });
+ 
+         if (options.skipScroll) {
+             return;
+diff --git a/src/content-scripts/keyboard-handler.js b/src/content-scripts/keyboard-handler.js
+index 19b1591..f62b1d1 100644
+--- a/src/content-scripts/keyboard-handler.js
++++ b/src/content-scripts/keyboard-handler.js
+@@ -3,18 +3,68 @@ export default class KeyboardShortcutManager {
+         this.actionMap = actionMap;
+         this.prefixKey = null;
+         this.prefixTimeout = null;
++
++        console.log('Enter key mapped as:', Object.keys(actionMap).find(key => 
++            actionMap[key] && actionMap[key].action && 
++            actionMap[key].action.name === 'bound openPost'));
++
+         this.setupListeners();
+     }
+ 
+     setupListeners() {
+-        document.addEventListener('keydown', this.handleKeyEvent.bind(this));
++        this.boundHandleKeyEvent = this.handleKeyEvent.bind(this);
++        document.addEventListener('keydown', this.boundHandleKeyEvent);
++
++        this.boundHandleEnterKey = this.handleEnterKey.bind(this);
++        document.addEventListener('keydown', this.boundHandleEnterKey);
++    }
++
++    handleEnterKey(event) {
++        // Only handle Enter key
++        if (event.key !== 'Enter') return;
++        
++        console.log('Enter key pressed on:', document.activeElement.tagName, 
++                    'data-testid:', document.activeElement.getAttribute('data-testid'));
++        
++        // Check if we're focused on a post
++        const isPostElement = document.activeElement &&
++            document.activeElement.getAttribute && 
++            (document.activeElement.getAttribute('data-testid')?.includes('feedItem-by-') || 
++             document.activeElement.getAttribute('data-testid')?.includes('postThreadItem-by-'));
++        
++        if (isPostElement) {
++            console.log('Post element has focus, executing openPost action');
++            event.preventDefault();
++            
++            // Get the openPost action from the actionMap
++            const openPostKey = Object.keys(this.actionMap).find(key => 
++                this.actionMap[key].action.name === 'bound openPost');
++            
++            if (openPostKey && this.actionMap[openPostKey]) {
++                this.actionMap[openPostKey].action(event);
++            } else {
++                console.error('Could not find openPost action in action map');
++            }
++        }
+     }
+ 
+     handleKeyEvent(event) {
++        if (event.key === 'Enter') return;
+         // make sure keys like Enter aren't converted to lower case
+         const key = event.key;
+         let normalizedKey = /^[a-zA-Z]$/.test(key) ? key.toLowerCase() : key;
+ 
++        if (normalizedKey === 'Enter') {
++            const isPostElement = document.activeElement.matches && 
++            document.activeElement.matches('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]');
++            console.log('pressing the normalized key Enter');
++            if (isPostElement) {
++                event.preventDefault();
++                this.actionMap['Enter'].action(event);
++                return;
++            }
++        }
++
+         if (normalizedKey === 'g' && !this.prefixKey) {
+             if (!this.shouldPreventShortcut(event)) {
+                 event.preventDefault();
+diff --git a/src/content-scripts/main.js b/src/content-scripts/main.js
+index 76e9381..1d6aaff 100644
+--- a/src/content-scripts/main.js
++++ b/src/content-scripts/main.js
+@@ -14,6 +14,8 @@ class BlueSkyShortcuts {
+             logLevel: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn'
+         });
+ 
++        window.__bskyShortcuts = this;
++
+         this.appState = new AppState();
+         this.initialize().catch(error => {
+             this.logger.error('Failed to initialize extension: ', error);
+@@ -257,6 +259,11 @@ class BlueSkyShortcuts {
+         this.resetFocus();
+         this.appState.updateState({ currentPost: nextPost, currentLinkIndex: -1 });
+         DOMUtils.safelyScrollIntoView(nextPost);
++
++        if (nextPost) {
++            nextPost.tabIndex = 0;
++            nextPost.focus({ preventScroll: true });
++        }
+     }
+ 
+     moveToPreviousPost() {
+@@ -285,6 +292,11 @@ class BlueSkyShortcuts {
+         this.resetFocus();
+         this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
+         DOMUtils.safelyScrollIntoView(prevPost);
++
++        if (prevPost) {
++            prevPost.tabIndex = 0;
++            prevPost.focus({ preventScroll: true });
++        }
+     }
+ 
+     async selectNearestVisiblePost() {
+@@ -523,15 +535,71 @@ class BlueSkyShortcuts {
+     }
+ 
+     openPost() {
+-        const { currentPost, currentLinkIndex } = this.appState.state;
++        const { currentPost } = this.appState.state;
++        this.logger.debug('trying to open post');
++        if (this.handleHighlightedLink()) {
++            return;
++        }
+ 
+-        if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
+-            this.logger.debug('No valid current post, attempting to select first visible post');
+-            return this.selectFirstVisiblePost();
++        const focusedPost = document.activeElement.matches('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]') 
++            ? document.activeElement 
++            : this.appState.state.currentPost;
++        
++        if (!focusedPost || !DOMUtils.isValidElement(focusedPost)) {
++            this.logger.debug('No valid focused post, attempting to select first visible post');
++            return this.selectNearestVisiblePost();
++        }
++        // const { currentPost, currentLinkIndex } = this.appState.state;
++
++        // if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
++        //     this.logger.debug('No valid current post, attempting to select first visible post');
++        //     return this.selectNearestVisiblePost();
++        // }
++
++        // // if a link is focused, open it instead of the post
++        // if (currentLinkIndex !== -1) {
++        //     const postContent = currentPost.querySelector('[data-testid*="postText"]');
++        //     if (postContent) {
++        //         const links = [...postContent.querySelectorAll('a[role="link"]')];
++        //         const targetLink = links[currentLinkIndex];
++        //         if (targetLink) {
++        //             targetLink.click();
++        //             targetLink.classList.remove('bsky-highlighted-link');
++        //             this.appState.updateState({ currentLinkIndex: -1 });
++        //             return;
++        //         }
++        //     }
++        // }
++
++        // const highlightedLink = currentPost.querySelector('.bsky-highlighted-link');
++        // if (highlightedLink) {
++        //     this.resetFocus();
++        //     highlightedLink.click();
++        //     highlightedLink.classList.remove('bsky-highlighted-link');
++        //     return;
++        // }
++
++        const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
++
++        const postLink = postLinks.find(link =>
++            /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-zA-Z0-9]+$/.test(link.href)
++        );
++
++        if (postLink) {
++            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
++                el.classList.remove('bsky-highlighted-post');
++            });
++            postLink.click();
++        } else {
++            this.logger.warn('No valid post link found');
+         }
++    }
+ 
+-        // if a link is focused, open it instead of the post
+-        if (currentLinkIndex !== -1) {
++    handleHighlightedLink() {
++        const { currentPost, currentLinkIndex } = this.appState.state;
++        
++        // If a link is focused via cycle links, click it
++        if (currentLinkIndex !== -1 && currentPost) {
+             const postContent = currentPost.querySelector('[data-testid*="postText"]');
+             if (postContent) {
+                 const links = [...postContent.querySelectorAll('a[role="link"]')];
+@@ -540,33 +608,21 @@ class BlueSkyShortcuts {
+                     targetLink.click();
+                     targetLink.classList.remove('bsky-highlighted-link');
+                     this.appState.updateState({ currentLinkIndex: -1 });
+-                    return;
++                    return true;
+                 }
+             }
+         }
+-
+-        const highlightedLink = currentPost.querySelector('.bsky-highlighted-link');
++    
++        // Check for highlighted link class
++        const highlightedLink = document.querySelector('.bsky-highlighted-link');
+         if (highlightedLink) {
+             this.resetFocus();
+             highlightedLink.click();
+             highlightedLink.classList.remove('bsky-highlighted-link');
+-            return;
+-        }
+-
+-        const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
+-
+-        const postLink = postLinks.find(link =>
+-            /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-zA-Z0-9]+$/.test(link.href)
+-        );
+-
+-        if (postLink) {
+-            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+-                el.classList.remove('bsky-highlighted-post');
+-            });
+-            postLink.click();
+-        } else {
+-            this.logger.warn('No valid post link found');
++            return true;
+         }
++        
++        return false;
+     }
+ 
+     expandPhoto() {
