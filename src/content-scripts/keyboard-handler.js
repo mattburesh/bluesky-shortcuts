@@ -17,7 +17,6 @@ export default class KeyboardShortcutManager {
     }
 
     handleKeyEvent(event) {
-        if (event.key === 'Enter') return;
         // make sure keys like Enter aren't converted to lower case
         const key = event.key;
         let normalizedKey = /^[a-zA-Z]$/.test(key) ? key.toLowerCase() : key;

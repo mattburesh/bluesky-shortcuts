@@ -536,7 +536,6 @@ class BlueSkyShortcuts {
 
     openPost() {
         const { currentPost } = this.appState.state;
-        this.logger.debug('trying to open post');
         if (this.handleHighlightedLink()) {
             return;
         }
@@ -549,35 +548,6 @@ class BlueSkyShortcuts {
             this.logger.debug('No valid focused post, attempting to select first visible post');
             return this.selectNearestVisiblePost();
         }
-        // const { currentPost, currentLinkIndex } = this.appState.state;
-
-        // if (!currentPost || !DOMUtils.isValidElement(currentPost)) {
-        //     this.logger.debug('No valid current post, attempting to select first visible post');
-        //     return this.selectNearestVisiblePost();
-        // }
-
-        // // if a link is focused, open it instead of the post
-        // if (currentLinkIndex !== -1) {
-        //     const postContent = currentPost.querySelector('[data-testid*="postText"]');
-        //     if (postContent) {
-        //         const links = [...postContent.querySelectorAll('a[role="link"]')];
-        //         const targetLink = links[currentLinkIndex];
-        //         if (targetLink) {
-        //             targetLink.click();
-        //             targetLink.classList.remove('bsky-highlighted-link');
-        //             this.appState.updateState({ currentLinkIndex: -1 });
-        //             return;
-        //         }
-        //     }
-        // }
-
-        // const highlightedLink = currentPost.querySelector('.bsky-highlighted-link');
-        // if (highlightedLink) {
-        //     this.resetFocus();
-        //     highlightedLink.click();
-        //     highlightedLink.classList.remove('bsky-highlighted-link');
-        //     return;
-        // }
 
         const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
 
