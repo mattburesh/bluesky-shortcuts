@@ -62,11 +62,20 @@ export default class DOMUtils {
             });
 
             element.classList.add('bsky-highlighted-post');
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest',
-                ...options
+
+            const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
+            const headerOffset = header ? header.offsetHeight + 12 : 60;
+            
+            // try to center the post if there is enough space to do so
+            const elementRect = element.getBoundingClientRect();
+            const elementHeight = elementRect.height;
+            const viewportHeight = window.innerHeight;
+            const availableHeight = viewportHeight - headerOffset;
+            const centerPosition = window.pageYOffset + elementRect.top - headerOffset - (availableHeight / 2 - elementHeight / 2);
+
+            window.scrollTo({
+                top: Math.max(0, centerPosition),
+                behavior: options.behavior || 'smooth'
             });
         }
     }

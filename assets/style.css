@@ -5,6 +5,17 @@
     box-shadow: 0 0 0 2px #0070FF;
     border-radius: 4px;
     position: relative;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+[data-testid*="feedItem-by-"],
+[data-testid*="postThreadItem-by-"] {
+    transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-out;
+    scroll-margin-top: 60px;
+}
+
+.bsky-highlighted-post {
+    transform: translateZ(0);
 }
 
 .bsky-highlighted-link {
