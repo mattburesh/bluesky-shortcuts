@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.2] - 2025-01-25
+### Added
+- Fix state issues and broken link clicking ([#43](https://github.com/mattburesh/bluesky-shortcuts/pull/43))
+
+## [1.5.1] - 2025-01-25
+### Added
+- Quick bugfix for opening posts broken by the last release
+
+## [1.5.0] - 2025-01-25
+### Added
+- Add link opening shortcut, fix focus styles ([#42](https://github.com/mattburesh/bluesky-shortcuts/pull/42))
+
 ## [1.4.0] - 2025-01-03
 ### Added
 - Add retry mechanism to element detection ([#38](https://github.com/mattburesh/bluesky-shortcuts/pull/38))
