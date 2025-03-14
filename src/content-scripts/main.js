@@ -560,6 +560,7 @@ class BlueSkyShortcuts {
                 el.classList.remove('bsky-highlighted-post');
             });
             postLink.click();
+            this.handleNavigation(postLink.pathname);
         } else {
             this.logger.warn('No valid post link found');
         }
