@@ -636,10 +636,6 @@ class BlueSkyShortcuts {
         const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
 
         if (loadPostsButton) {
-            const initialChildCount = loadPostsButton.childElementCount;
-            const hasNewPostsIndicator = initialChildCount > 1;
-            this.logger.debug('New posts indicator present:', hasNewPostsIndicator);
-
             this.appState.updateState({ currentPost: null });
             
             const { currentController } = this.appState.state;
@@ -654,8 +650,7 @@ class BlueSkyShortcuts {
     
             try {
                 await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
-                const timeoutDuration = hasNewPostsIndicator ? 300 : 0;
-                await new Promise(resolve => setTimeout(resolve, timeoutDuration));
+                await new Promise(resolve => setTimeout(resolve, 300));
                 const visiblePosts = DOMUtils.findVisiblePosts();
                 
                 if (visiblePosts.length > 0) {
