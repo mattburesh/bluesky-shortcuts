@@ -636,25 +636,31 @@ class BlueSkyShortcuts {
         const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
 
         if (loadPostsButton) {
-            loadPostsButton.click();
+            const initialChildCount = loadPostsButton.childElementCount;
+            const hasNewPostsIndicator = initialChildCount > 1;
+            this.logger.debug('New posts indicator present:', hasNewPostsIndicator);
 
             this.appState.updateState({ currentPost: null });
+            
+            const { currentController } = this.appState.state;
+            if (currentController) {
+                currentController.abort();
+            }
+    
+            const newController = new AbortController();
+            this.appState.updateState({ currentController: newController });
 
+            loadPostsButton.click();
+    
             try {
-                const { currentController } = this.appState.state;
-                if (currentController) {
-                    currentController.abort();
-                }
-
-                const newController = new AbortController();
-                this.appState.updateState({ currentController: newController });
-
                 await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
-                await new Promise(resolve => setTimeout(resolve, 150));
-
+                const timeoutDuration = hasNewPostsIndicator ? 300 : 0;
+                await new Promise(resolve => setTimeout(resolve, timeoutDuration));
                 const visiblePosts = DOMUtils.findVisiblePosts();
+                
                 if (visiblePosts.length > 0) {
                     const firstPost = visiblePosts[0];
+                    this.logger.debug('Selecting first post after loading new posts:', firstPost);
                     this.appState.updateState({ currentPost: firstPost });
                     DOMUtils.safelyScrollIntoView(firstPost);
                 }
