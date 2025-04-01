@@ -26,7 +26,7 @@ A browser extension for adding shortcuts to bsky.app.
 4. Visit the [chrome extensions page](chrome://extensions/)
     1. (or enter `chrome://extensions/` in the Chrome address bar)
 5. Enable `Developer mode` in the top right
-6. Click `Load unpacked` in the top left and select the `bsky-shortcuts/build` folder
+6. Click `Load unpacked` in the top left and select the `bsky-shortcuts/build/chrome` folder
 
 ## Contributing
 
