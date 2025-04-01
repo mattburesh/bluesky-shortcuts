@@ -258,7 +258,7 @@ class BlueSkyShortcuts {
 
         this.resetFocus();
         this.appState.updateState({ currentPost: nextPost, currentLinkIndex: -1 });
-        DOMUtils.safelyScrollIntoView(nextPost);
+        DOMUtils.safelyScrollIntoView(nextPost, { behavior: 'instant' });
 
         if (nextPost) {
             nextPost.tabIndex = 0;
@@ -291,7 +291,7 @@ class BlueSkyShortcuts {
 
         this.resetFocus();
         this.appState.updateState({ currentPost: prevPost, currentLinkIndex: -1 });
-        DOMUtils.safelyScrollIntoView(prevPost);
+        DOMUtils.safelyScrollIntoView(prevPost, { behavior: 'instant' });
 
         if (prevPost) {
             prevPost.tabIndex = 0;
