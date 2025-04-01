@@ -63,6 +63,13 @@ export default class DOMUtils {
         });
     }
 
+    /**
+     * Safely scroll into view
+     * @param {Element} element - The element to scroll into view
+     * @param {Object} options - The options for the scroll
+     * @param {boolean} options.skipScroll - Whether to skip the scroll
+     * @param {"smooth"|"instant"|"auto"} options.behavior - The behavior of the scroll. See [here](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo#behavior) for more information.
+     */
     static safelyScrollIntoView(element, options = {}) {
         if (!element) return;
 
