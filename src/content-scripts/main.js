@@ -141,6 +141,10 @@ class BlueSkyShortcuts {
             [config.shortcuts.loadMore]: {
                 action: this.loadMore.bind(this)
             },
+            [config.shortcuts.accountSwitcher]: {
+                action: this.switchAccount.bind(this),
+                allowedModifiers: ['alt']
+            },
             [config.shortcuts.showShortcuts]: {
                 action: () => this.shortcutsModal.toggle(),
                 allowedModifiers: ['shift']
@@ -664,6 +668,65 @@ class BlueSkyShortcuts {
                     this.logger.error('Failed to load new posts', error);
                 }
             }
+        }
+    }
+
+    switchAccount() {
+        try {
+            const profileButton = document.querySelector('button[aria-label="Switch accounts"]')
+            if (!profileButton) {
+                this.logger.warn('Can\'t switch accounts, profile button not found');
+                return;
+            }
+            profileButton.click();
+
+            DOMUtils.waitForElement('[role="menuitem"][aria-label^="Switch to"]', 1000)
+                .then(element => {
+                    const accountOptions = Array.from(document.querySelectorAll('[role="menuitem"][aria-label^="Switch to"]'))
+                        // .find(item => item.getAttribute('aria-label')?.startsWith('Switch to'));
+
+                    this.logger.debug(accountOptions);
+                    
+                    if (accountOptions.length === 0) {
+                        document.body.click();
+                        this.logger.info('No other accounts to switch to');
+                        return;
+                    }
+
+                    let accountToSwitch;
+                    const lastSwitchedAccount = this.appState.state.lastSwitchedAccount;
+
+                    if (!lastSwitchedAccount) {
+                        accountToSwitch = accountOptions[0];
+                    } else {
+                        // find the account that comes after the last one we switched to
+                        const accountLabels = accountOptions.map(opt => 
+                            opt.getAttribute('aria-label') || ''
+                        );
+
+                        const lastIndex = accountLabels.findIndex(label =>
+                            label === lastSwitchedAccount
+                        );
+
+                        if (lastIndex === -1 || lastIndex === accountOptions.length -1) {
+                            accountToSwitch = accountOptions[0];
+                        } else {
+                            accountToSwitch = accountOptions[lastIndex + 1];
+                        }
+                    }
+
+                    this.appState.updateState({
+                        lastSwitchedAccount: accountToSwitch.getAttribute('aria-label')
+                    });
+
+                    accountToSwitch.click();
+                })
+                .catch(error => {
+                    this.logger.error('Failed to find account menu items', error);
+                    document.body.click();
+                });
+        } catch (error) {
+            this.logger.error('Error in switch account', error);
         }
     }
 

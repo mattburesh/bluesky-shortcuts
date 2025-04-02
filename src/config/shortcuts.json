@@ -13,6 +13,7 @@
         "focusSearch": "/",
         "showShortcuts": "?",
         "loadMore": ".",
+        "accountSwitcher": "a",
 
         "goHome": "gh",
         "goProfile": "gp",
