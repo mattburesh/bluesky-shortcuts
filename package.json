@@ -1,6 +1,6 @@
 {
     "name": "bluesky-shortcuts",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "description": "Adds keyboard shortcuts to bsky.app",
     "scripts": {
         "build": "npm run build:chrome:prod && npm run build:firefox:prod",
