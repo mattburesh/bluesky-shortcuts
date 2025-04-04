@@ -143,7 +143,7 @@ class BlueSkyShortcuts {
             },
             [config.shortcuts.accountSwitcher]: {
                 action: this.switchAccount.bind(this),
-                allowedModifiers: ['alt']
+                requiredModifiers: ['alt']
             },
             [config.shortcuts.showShortcuts]: {
                 action: () => this.shortcutsModal.toggle(),
