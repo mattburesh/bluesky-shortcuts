@@ -681,12 +681,12 @@ class BlueSkyShortcuts {
             }
             profileButton.click();
 
-            DOMUtils.waitForElement('[role="menuitem"][aria-label^="Switch to"]', 1000)
+            DOMUtils.waitForElement('[role="menuitem"][aria-label^="Switch to"]', 50, null, { maxRetries: 0, retryDelay: 0 })
                 .then(element => {
                     const accountOptions = Array.from(document.querySelectorAll('[role="menuitem"][aria-label^="Switch to"]'))
-                    
+
                     if (accountOptions.length === 0) {
-                        document.body.click();
+                        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
                         this.logger.info('No other accounts to switch to');
                         return;
                     }
@@ -769,16 +769,16 @@ class BlueSkyShortcuts {
                                 this.selectNearestVisiblePost().catch(error => {
                                     this.logger.error('Failed to select post after account switch', error);
                                 });
-                            }, 300);
-                        }, 500);
+                            }, 150);
+                        }, 250);
                     } else {
                         this.logger.error('Target account not in dropdown, using first available');
-                        document.body.click();
+                        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
                     }
                 })
                 .catch(error => {
                     this.logger.error('Failed to find account menu items', error);
-                    document.body.click();
+                    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
                 });
         } catch (error) {
             this.logger.error('Error in switch account', error);
