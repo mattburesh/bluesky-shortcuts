@@ -9,7 +9,8 @@ class AppState {
             currentLinkIndex: -1, // -1 = open selected post, n = open nth link in post
             currentController: null,
             location: window.location.pathname,
-            lastSwitchedAccount: null
+            knownAccounts: [],
+            lastAccount: null
         };
         this.subscribers = new Set();
         this.logger = logger ?? new Logger();
