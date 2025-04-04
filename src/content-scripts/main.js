@@ -62,7 +62,7 @@ class BlueSkyShortcuts {
         await DOMUtils.waitForElement('div.css-175oi2r.r-13awgt0.r-12vffkv');
     }
 
-    async initializeFeedTabs() {
+    async initializeFeedTabs(forceUpdate = false) {
         if (this._initializeTimeout) {
             clearTimeout(this._initializeTimeout);
         }
@@ -88,7 +88,7 @@ class BlueSkyShortcuts {
                 };
             });
             // Only update the state if it hasn't been initialized yet
-            if (!this.appState.state.feedTabs?.length) {
+            if (!this.appState.state.feedTabs?.length || forceUpdate) {
                 const currentFeedIndex = feedTabs.findIndex(tab => tab.isActive);
                 this.appState.updateState({
                     feedTabs,
@@ -140,6 +140,10 @@ class BlueSkyShortcuts {
             },
             [config.shortcuts.loadMore]: {
                 action: this.loadMore.bind(this)
+            },
+            [config.shortcuts.accountSwitcher]: {
+                action: this.switchAccount.bind(this),
+                requiredModifiers: ['alt']
             },
             [config.shortcuts.showShortcuts]: {
                 action: () => this.shortcutsModal.toggle(),
@@ -206,7 +210,7 @@ class BlueSkyShortcuts {
         this.logger.debug('State changed:', state);
     }
 
-    handleNavigation(newPath) {
+    handleNavigation(newPath, forceUpdate = false) {
         this.logger.debug('Navigation occurred to:', newPath);
 
         if (this.appState.state.currentController) {
@@ -221,7 +225,7 @@ class BlueSkyShortcuts {
         });
 
         if (newPath === '/') {
-            this.initializeFeedTabs().catch(error => {
+            this.initializeFeedTabs(forceUpdate).catch(error => {
                 this.logger.error('Failed to initialize feed tabs after navigation', error);
             });
         }
@@ -664,6 +668,120 @@ class BlueSkyShortcuts {
                     this.logger.error('Failed to load new posts', error);
                 }
             }
+        }
+    }
+
+    switchAccount() {
+        const { lastAccount, knownAccounts } = this.appState.state;
+        try {
+            const profileButton = document.querySelector('button[aria-label="Switch accounts"]')
+            if (!profileButton) {
+                this.logger.warn('Can\'t switch accounts, profile button not found');
+                return;
+            }
+            profileButton.click();
+
+            DOMUtils.waitForElement('[role="menuitem"][aria-label^="Switch to"]', 1000)
+                .then(element => {
+                    const accountOptions = Array.from(document.querySelectorAll('[role="menuitem"][aria-label^="Switch to"]'))
+                    
+                    if (accountOptions.length === 0) {
+                        document.body.click();
+                        this.logger.info('No other accounts to switch to');
+                        return;
+                    }
+
+                    const dropdownUsernames = accountOptions.map(opt => {
+                        const label = opt.getAttribute('aria-label') || '';
+                        const handle = label.substring(label.indexOf('@'));
+                        return handle;
+                    }).filter(Boolean);
+
+                    // add accounts to state if they are missing
+                    dropdownUsernames.forEach(username => {
+                        if (!knownAccounts.includes(username)) {
+                            knownAccounts.push(username);
+                        }
+                    });
+                    knownAccounts.sort();
+
+                    const currentIndex = knownAccounts.indexOf(lastAccount) || 0;
+                    const nextIndex = (currentIndex + 1) % knownAccounts.length;
+                    const nextUsername = knownAccounts[nextIndex];
+                    const targetAccount = accountOptions.find(opt => {
+                        const label = opt.getAttribute('aria-label') || '';
+                        return label.includes(nextUsername)
+                    });
+
+                    this.appState.updateState({
+                        knownAccounts: knownAccounts,
+                        lastAccount: nextUsername
+                    })
+
+                    if (targetAccount) {
+                        targetAccount.click();
+
+                        this.logger.debug("switchAccount has just been called");
+
+                        this.appState.updateState({
+                            feedTabs: [],
+                            currentFeedIndex: 0,
+                            currentPost: null,
+                            currentLinkIndex: -1,
+                            currentController: null
+                        });
+
+                        setTimeout(async () => {
+                            if (window.location.pathname === '/') {
+                                try {
+                                    // Remove the feed tab click listener 
+                                    const originalHandleFeedTabClick = this.handleFeedTabClick;
+                                    this.handleFeedTabClick = () => {}; 
+                                    
+                                    const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div', 2000);
+                                    
+                                    const tabElements = [...tabContainer.children];
+                                    if (tabElements.length > 0) {
+                                        tabElements[0].click();
+                                        
+                                        await new Promise(resolve => setTimeout(resolve, 100));
+                                        await this.initializeFeedTabs(true);
+                                        
+                                        this.appState.updateState({
+                                            currentFeedIndex: 0,
+                                            feedTabs: this.appState.state.feedTabs.map((tab, i) => ({
+                                                ...tab,
+                                                isActive: i === 0
+                                            }))
+                                        });
+                                    }
+                                    
+                                    // Restore the original handler
+                                    this.handleFeedTabClick = originalHandleFeedTabClick;
+                                } catch (error) {
+                                    this.logger.error('Failed to initialize feed tabs after count switch', error);
+                                }
+                            }
+
+                            this.handleNavigation(window.location.pathname, true);
+
+                            setTimeout(() => {
+                                this.selectNearestVisiblePost().catch(error => {
+                                    this.logger.error('Failed to select post after account switch', error);
+                                });
+                            }, 300);
+                        }, 500);
+                    } else {
+                        this.logger.error('Target account not in dropdown, using first available');
+                        document.body.click();
+                    }
+                })
+                .catch(error => {
+                    this.logger.error('Failed to find account menu items', error);
+                    document.body.click();
+                });
+        } catch (error) {
+            this.logger.error('Error in switch account', error);
         }
     }
 

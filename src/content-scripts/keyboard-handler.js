@@ -31,7 +31,7 @@ export default class KeyboardShortcutManager {
                 }, 500);
                 return;
             }
-        }
+        } 
 
         if (this.prefixKey === 'g') {
             clearTimeout(this.prefixTimeout);
@@ -42,10 +42,23 @@ export default class KeyboardShortcutManager {
         const mapping = this.actionMap[normalizedKey];
         if (!mapping) return;
 
+        // check for required modifiers
+        if (mapping.requiredModifiers && !this.checkRequiredModifiers(event, mapping.requiredModifiers)) {
+            return;
+        }
+
         if (this.shouldPreventShortcut(event, mapping.allowedModifiers)) return;
 
         event.preventDefault();
         mapping.action(event);
+    }
+
+    checkRequiredModifiers(event, requiredModifiers) {
+        if (requiredModifiers.includes('alt') && !event.altKey) return false;
+        if (requiredModifiers.includes('ctrl') && !event.ctrlKey) return false;
+        if (requiredModifiers.includes('shift') && !event.shiftKey) return false;
+        if (requiredModifiers.includes('meta') && !event.metaKey) return false;
+        return true;
     }
 
     shouldPreventShortcut(event, allowedModifiers = []) {
@@ -57,6 +70,14 @@ export default class KeyboardShortcutManager {
 
         if (isInputElement) {
             return true;
+        }
+
+        const mapping = this.actionMap[event.key.toLowerCase()];
+        if (mapping && mapping.requiredModifiers) {
+            if (mapping.requiredModifiers.includes('alt') && event.altKey) return false;
+            if (mapping.requiredModifiers.includes('ctrl') && event.ctrlKey) return false;
+            if (mapping.requiredModifiers.includes('shift') && event.shiftKey) return false;
+            if (mapping.requiredModifiers.includes('meta') && event.metaKey) return false;
         }
 
         return (event.ctrlKey && !allowedModifiers.includes('ctrl')) ||
