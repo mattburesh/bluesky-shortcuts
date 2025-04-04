@@ -18,7 +18,8 @@ class ShortcutsModal {
             { key: 'c', description: 'Next pinned feed' },
             { modifier: 'Shift', key: 'c', description: 'Previous pinned feed' },
             { key: '.', description: 'Load more posts' },
-            { key: '?', description: 'Toggle shortcuts' }
+            { key: '?', description: 'Toggle shortcuts' },
+            { modifier: 'Alt', key: 'a', description: 'Switch to next account'}
         ];
 
         // more
