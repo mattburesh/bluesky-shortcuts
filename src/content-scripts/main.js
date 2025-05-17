@@ -59,7 +59,7 @@ class BlueSkyShortcuts {
     }
 
     async waitForAppLoad() {
-        await DOMUtils.waitForElement('div.css-175oi2r.r-13awgt0.r-12vffkv');
+        await DOMUtils.waitForElement('div#root > div:not(#splash)');
     }
 
     async initializeFeedTabs(forceUpdate = false) {
