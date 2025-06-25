@@ -637,7 +637,7 @@ class BlueSkyShortcuts {
     }
 
     async loadMore() {
-        const loadPostsButton = document.querySelector('[aria-label*="Load new posts"]') ?? null;
+        const loadPostsButton = document.querySelector( 'div[data-testid="loadLatestBtn"] button') ?? null;
 
         if (loadPostsButton) {
             this.appState.updateState({ currentPost: null });
