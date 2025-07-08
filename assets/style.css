@@ -72,7 +72,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 0;
 }
 
 .bsky-shortcuts-content {
@@ -155,20 +155,31 @@
     flex-grow: 1;
 }
 
-@media (max-width: 640px) {
-    .bsky-shortcuts-columns {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
+.bsky-shortcuts-columns {
+    display: block;
+}
+
+.bsky-shortcuts-columns > .bsky-shortcuts-section:not(:last-child) {
+    margin-bottom: 1.5rem;
 }
 
 @media (min-width: 640px) {
-    .bsky-shortcuts-section:first-of-type {
-        grid-row: 1 / 3;
+    .bsky-shortcuts-overlay {
+        padding: 1rem;
     }
-    
-    .bsky-shortcuts-section:not(:first-of-type) {
-        grid-column-start: 2;
+
+    .bsky-shortcuts-columns {
+        column-count: 2;
+        column-gap: 2rem;
+    }
+
+    .bsky-shortcuts-section {
+        break-inside: avoid;
+        margin-bottom: 2rem;
+    }
+
+    .bsky-shortcuts-columns > .bsky-shortcuts-section:not(:last-child) {
+        margin-bottom: 2rem;
     }
 }
 

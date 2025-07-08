@@ -1,46 +1,56 @@
 class ShortcutsModal {
     constructor() {
         this.isVisible = false;
-
-        // general
-        this.shortcuts = [
-            { key: 'j', description: 'Move to next post' },
-            { key: 'k', description: 'Move to previous post' },
-            { key: 'l', description: 'Like post' },
-            { key: 'r', description: 'Reply to post' },
-            { key: 't', description: 'Repost post' },
-            { modifier: 'Shift', key: 't', description: 'Quote post' },
-            { key: 'o', description: 'Expand image' },
-            { key: 'Enter', description: 'Open selected post/link' },
-            { key: 'v', description: 'Select next link in post.' },
-            { modifier: 'Shift', key: 'v', description: 'Select next previous link in post.' },
-            { key: '/', description: 'Search' },
-            { key: 'c', description: 'Next pinned feed' },
-            { modifier: 'Shift', key: 'c', description: 'Previous pinned feed' },
-            { key: '.', description: 'Load more posts' },
-            { key: '?', description: 'Toggle shortcuts' },
-            { modifier: 'Alt', key: 'a', description: 'Switch to next account'}
-        ];
-
-        // more
-        this.postOptions = [
-            { key: 'h', description: 'Hide post' },
-            { key: 'b', description: 'Block account' },
-            { key: 'm', description: 'Mute account' },
-            { key: 'x', description: 'Report post' },
-            { key: 'y', description: 'Copy post text' }
-        ];
-
-        // navigation
-        this.goShortcuts = [
-            { key: 'g h', description: 'Go Home' },
-            { key: 'g p', description: 'Go to Profile' },
-            { key: 'g n', description: 'Go to Notifications' },
-            { key: 'g c', description: 'Go to Chat' },
-            { key: 'g f', description: 'Go to Feeds' },
-            { key: 'g l', description: 'Go to Lists' },
-            { key: 'g s', description: 'Go to Settings' },
-            { key: 'g u', description: 'Go to User Profile' }
+        this.shortcutSections = [
+            {
+                title: 'Post Navigation',
+                shortcuts: [
+                    { key: 'j', description: 'Move to next post' },
+                    { key: 'k', description: 'Move to previous post' },
+                    { key: 'v', description: 'Select next link in post' },
+                    { modifier: 'Shift', key: 'v', description: 'Select previous link in post' },
+                    { key: '.', description: 'Load more posts' },
+                ]
+            },
+            {
+                title: 'Post Actions',
+                shortcuts: [
+                    { key: 'Enter', description: 'Open selected post/link' },
+                    { key: 'l', description: 'Like post' },
+                    { key: 'r', description: 'Reply to post' },
+                    { key: 't', description: 'Repost post' },
+                    { modifier: 'Shift', key: 't', description: 'Quote post' },
+                    { key: 'o', description: 'Expand image' },
+                    { key: 'h', description: 'Hide post' },
+                    { key: 'b', description: 'Block account' },
+                    { key: 'm', description: 'Mute account' },
+                    { key: 'x', description: 'Report post' },
+                    { key: 'y', description: 'Copy post text' }
+                ]
+            },
+            {
+                title: 'Application',
+                shortcuts: [
+                    { key: 'c', description: 'Next pinned feed' },
+                    { modifier: 'Shift', key: 'c', description: 'Previous pinned feed' },
+                    { key: '/', description: 'Search' },
+                    { modifier: 'Alt', key: 'a', description: 'Switch to next account'},
+                    { key: '?', description: 'Toggle shortcuts' }
+                ]
+            },
+            {
+                title: 'Go To',
+                shortcuts: [
+                    { key: 'g h', description: 'Go to Home' },
+                    { key: 'g p', description: 'Go to Profile' },
+                    { key: 'g u', description: "Go to post author's profile" },
+                    { key: 'g n', description: 'Go to Notifications' },
+                    { key: 'g c', description: 'Go to Chat' },
+                    { key: 'g f', description: 'Go to Feeds' },
+                    { key: 'g l', description: 'Go to Lists' },
+                    { key: 'g s', description: 'Go to Settings' },
+                ]
+            }
         ];
 
         this.initialize();
@@ -142,13 +152,10 @@ class ShortcutsModal {
         const columnsContainer = document.createElement('div');
         columnsContainer.className = 'bsky-shortcuts-columns';
 
-        const regularSection = this.createShortcutSection('General', this.shortcuts);
-        const navigationSection = this.createShortcutSection('Navigation', this.goShortcuts);
-        const optionsSection = this.createShortcutSection('Post Options', this.postOptions);
-
-        columnsContainer.appendChild(regularSection);
-        columnsContainer.appendChild(navigationSection);
-        columnsContainer.appendChild(optionsSection);
+        this.shortcutSections.forEach(section => {
+            const sectionElement = this.createShortcutSection(section.title, section.shortcuts);
+            columnsContainer.appendChild(sectionElement);
+        });
 
         content.appendChild(header);
         content.appendChild(columnsContainer);

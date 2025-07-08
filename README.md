@@ -34,32 +34,52 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 
 ## Shortcuts
 
+### Post Navigation
 | Key                             | Action                             |
 |---------------------------------|------------------------------------|
-| <kbd>j</kbd>                    | Move Down                          |
-| <kbd>k</kbd>                    | Move Up                            |
-| <kbd>.</kbd>                    | Load More Posts                    |
-| <kbd>Enter</kbd>                | Open Post                          |
-| <kbd>l</kbd>                    | Like Post                          |
-| <kbd>r</kbd>                    | Reply                              |
-| <kbd>t</kbd>                    | Repost (press again to undo)       |
-| <kbd>Shift</kbd> + <kbd>t</kbd> | Quote Post                         |
-| <kbd>o</kbd>                    | Expand Image                       |
-| <kbd>c</kbd>                    | Cycle Forward Through Saved Feeds  |
-| <kbd>Shift</kbd> + <kbd>c</kbd> | Cycle Backward Through Saved Feeds |
+| <kbd>j</kbd>                    | Move to next post                  |
+| <kbd>k</kbd>                    | Move to previous post              |
 | <kbd>v</kbd>                    | Select next link in post           |
-| <kbd>Shift</kbd> + <kbd>v</kbd> | Select next previous link in post  |
-| <kbd>Alt</kbd> + <kbd>a</kbd>   | Switch to next account             |
+| <kbd>Shift</kbd> + <kbd>v</kbd> | Select previous link in post       |
+| <kbd>.</kbd>                    | Load more posts                    |
+
+### Post Actions
+| Key                             | Action                             |
+|---------------------------------|------------------------------------|
+| <kbd>Enter</kbd>                | Open selected post/link            |
+| <kbd>l</kbd>                    | Like post                          |
+| <kbd>r</kbd>                    | Reply to selected post             |
+| <kbd>t</kbd>                    | Repost (press again to undo)       |
+| <kbd>Shift</kbd> + <kbd>t</kbd> | Quote post                         |
+| <kbd>o</kbd>                    | Expand image                       |
+| <kbd>h</kbd>                    | Hide post                          |
+| <kbd>b</kbd>                    | Block account                      |
+| <kbd>m</kbd>                    | Mute account                       |
+| <kbd>x</kbd>                    | Report post                        |
+| <kbd>y</kbd>                    | Copy post text                     |
+
+### Application
+| Key                             | Action                             |
+|---------------------------------|------------------------------------|
+| <kbd>c</kbd>                    | Cycle forward through saved feeds  |
+| <kbd>Shift</kbd> + <kbd>c</kbd> | Cycle backward through saved feeds |
 | <kbd>/</kbd>                    | Focus Search                       |
-| <kbd>g</kbd> <kbd>h</kbd>       | Go to Home                         |
-| <kbd>g</kbd> <kbd>p</kbd>       | Go to Profile                      |
+| <kbd>Alt</kbd> + <kbd>a</kbd>   | Switch to next account             |
+| <kbd>?</kbd>                    | Show shortcuts                     |
+
+### Go To
+| Key                             | Action                             |
+|---------------------------------|------------------------------------|
+| <kbd>g</kbd> <kbd>h</kbd>       | Go to home                         |
+| <kbd>g</kbd> <kbd>p</kbd>       | Go to profile                      |
 | <kbd>g</kbd> <kbd>u</kbd>       | Go to post author profile          |
-| <kbd>g</kbd> <kbd>n</kbd>       | Go to Notifications                |
-| <kbd>g</kbd> <kbd>c</kbd>       | Go to Chat                         |
-| <kbd>g</kbd> <kbd>f</kbd>       | Go to Feeds                        |
-| <kbd>g</kbd> <kbd>l</kbd>       | Go to Lists                        |
-| <kbd>g</kbd> <kbd>s</kbd>       | Go to Settings                     |
-| <kbd>?</kbd>                    | Show Shortcuts                     |
+| <kbd>g</kbd> <kbd>n</kbd>       | Go to notifications                |
+| <kbd>g</kbd> <kbd>c</kbd>       | Go to chat                         |
+| <kbd>g</kbd> <kbd>f</kbd>       | Go to feeds                        |
+| <kbd>g</kbd> <kbd>l</kbd>       | Go to lists                        |
+| <kbd>g</kbd> <kbd>s</kbd>       | Go to settings                     |
+
+
 
 ## Changelog
 
