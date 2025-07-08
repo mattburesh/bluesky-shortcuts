@@ -179,6 +179,9 @@ class BlueSkyShortcuts {
             [config.shortcuts.blockAccount]: {
                 action: () => this.handleOptionsAction('block account', 'postDropdownBlockBtn')
             },
+            [config.shortcuts.muteAccount]: {
+                action: () => this.handleOptionsAction('mute account', 'postDropdownMuteBtn')
+            },
             [config.shortcuts.reportPost]: {
                 action: () => this.handleOptionsAction('report post', 'postDropdownReportBtn')
             },
