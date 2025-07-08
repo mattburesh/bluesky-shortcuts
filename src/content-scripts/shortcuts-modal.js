@@ -26,6 +26,7 @@ class ShortcutsModal {
         this.postOptions = [
             { key: 'h', description: 'Hide post' },
             { key: 'b', description: 'Block account' },
+            { key: 'm', description: 'Mute account' },
             { key: 'x', description: 'Report post' },
             { key: 'y', description: 'Copy post text' }
         ];
