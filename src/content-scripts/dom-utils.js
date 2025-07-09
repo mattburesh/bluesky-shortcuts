@@ -43,7 +43,7 @@ export default class DOMUtils {
 
     static findVisiblePosts() {
         var searchResults = []
-        if (document.title === "Hashtag — Bluesky" || document.title === "Explore — Bluesky") {
+        if ([/Hashtag — Bluesky$/, /Explore — Bluesky$/].some(pattern => pattern.test(document.title))) {
             // This selector matches all posts in search lists, but can throw
             // false positives in other views like threads
             const searchQuery = 'div:not([style]) > div[role="link"][tabindex]:not([aria-label*="Reposted by"])'
