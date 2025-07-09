@@ -41,15 +41,21 @@ export default class DOMUtils {
         return attempt();
     }
 
-    /**
-     * Todo: Add search results feed
-     */
     static findVisiblePosts() {
+        var searchResults = []
+        if ([/Hashtag — Bluesky$/, /Explore — Bluesky$/].some(pattern => pattern.test(document.title))) {
+            // This selector matches all posts in search lists, but can throw
+            // false positives in other views like threads
+            const searchQuery = 'div:not([style]) > div[role="link"][tabindex]:not([aria-label*="Reposted by"])'
+            searchResults = document.querySelectorAll(searchQuery)
+        }
         const feedItems = [
             // Main feed items
             ...document.querySelectorAll('div[data-testid*="feedItem-by-"]'),
             // Thread/reply items
-            ...document.querySelectorAll('div[data-testid*="postThreadItem-by-"]')
+            ...document.querySelectorAll('div[data-testid*="postThreadItem-by-"]'),
+            // Search results
+            ...searchResults
         ].filter(el => el.offsetParent !== null);
 
         return feedItems;
