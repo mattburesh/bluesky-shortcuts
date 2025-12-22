@@ -415,7 +415,36 @@ class BlueSkyShortcuts {
         let saveBtn =
             currentPost.querySelector('[aria-label*="Add to saved posts"]') ??
             currentPost.querySelector('[aria-label*="Remove from saved posts"]')
-        saveBtn?.click()
+
+        if (saveBtn) {
+            let toggledPost = currentPost
+            let previousPost = currentPost.parentElement.previousElementSibling.querySelector('div[role="link"]')
+
+            // If the saved post was removed from the feed, move selection to the previous post
+            let observer = new MutationObserver((mutationList, observer) => {
+                for (const mutation of mutationList) {
+                    // Filter: ignore svg effects
+                    let did_remove_post = [...mutation.removedNodes].some(n => n.contains(toggledPost))
+                    if (did_remove_post) {
+                        console.log(toggledPost, this.appState.state.currentPost, previousPost)
+                        this.appState.updateState({
+                            currentPost: mutation.previousSibling,
+                            currentLinkIndex: -1
+                        });
+                        return
+                    }
+                }
+            });
+
+            observer.observe(document.body, {childList: true, subtree: true})
+
+            saveBtn?.click()
+
+            setTimeout(() => {
+                // Saved post wasn't removed from any lists (or we already fired)
+                observer.disconnect()
+            }, 1000);
+        }
     }
 
     cycleFeed(event) {
