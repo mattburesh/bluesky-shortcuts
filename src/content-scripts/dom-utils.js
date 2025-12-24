@@ -12,9 +12,9 @@ export default class DOMUtils {
                             reject('cancelled');
                             return;
                         }
-        
+
                         const element = document.querySelector(selector);
-                        
+
                         if (element) {
                             resolve(element);
                         } else if (Date.now() - startTime > timeout) {
@@ -30,7 +30,7 @@ export default class DOMUtils {
                 if (error === 'cancelled' || retryCount >= retryOptions.maxRetries) {
                     throw error;
                 }
-                
+
                 retryCount++;
                 console.log('retry ' + retryCount );
                 await new Promise(resolve => setTimeout(resolve, retryOptions.retryDelay));
@@ -43,7 +43,12 @@ export default class DOMUtils {
 
     static findVisiblePosts() {
         var searchResults = []
-        if ([/Hashtag — Bluesky$/, /Explore — Bluesky$/].some(pattern => pattern.test(document.title))) {
+        const feedPatterns = [
+            /Hashtag — Bluesky$/,
+            /Explore — Bluesky$/,
+            /Saved Posts — Bluesky/
+        ]
+        if (feedPatterns.some(pattern => pattern.test(document.title))) {
             // This selector matches all posts in search lists, but can throw
             // false positives in other views like threads
             const searchQuery = 'div:not([style]) > div[role="link"][tabindex]:not([aria-label*="Reposted by"])'
@@ -104,13 +109,13 @@ export default class DOMUtils {
                 // Stop event propagation to prevent conflicts
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Find and execute the openPost action from our main keyboard handler
                 const shortcutInstance = window.__bskyShortcuts;
                 if (shortcutInstance) {
                     shortcutInstance.openPost();
                 }
-                
+
                 return false;
             }
         };
@@ -123,12 +128,12 @@ export default class DOMUtils {
 
         const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
         const headerOffset = header ? header.offsetHeight + 12 : 60;
-        
+
         // try to center the post if there is enough space to do so
         const elementRect = element.getBoundingClientRect();
         const elementHeight = elementRect.height;
         const viewportHeight = window.innerHeight;
-        
+
         const availableHeight = viewportHeight - headerOffset;
 
         let scrollPosition;
@@ -149,13 +154,13 @@ export default class DOMUtils {
         return visiblePosts.reduce((closest, post) => {
             const postRect = post.getBoundingClientRect();
             const closestRect = closest.getBoundingClientRect();
-            return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top) 
+            return Math.abs(postRect.top - currentRect.top) < Math.abs(closestRect.top - currentRect.top)
                 ? post : closest;
         });
     }
 
     static isValidElement(element) {
-        return element && 
+        return element &&
                element.isConnected &&
                element.offsetParent != null
     }

@@ -22,6 +22,7 @@ class ShortcutsModal {
                     { modifier: 'Shift', key: 't', description: 'Quote post' },
                     { key: 'o', description: 'Expand image' },
                     { key: 'h', description: 'Hide post' },
+                    { key: 's', description: 'Save post' },
                     { key: 'b', description: 'Block account' },
                     { key: 'm', description: 'Mute account' },
                     { key: 'x', description: 'Report post' },

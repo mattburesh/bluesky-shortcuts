@@ -25,6 +25,7 @@
         "goSettings": "gs",
 
         "hidePost": "h",
+        "savePost": "s",
         "blockAccount": "b",
         "muteAccount": "m",
         "reportPost": "x",

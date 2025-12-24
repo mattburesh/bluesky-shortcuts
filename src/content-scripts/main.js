@@ -176,6 +176,9 @@ class BlueSkyShortcuts {
             [config.shortcuts.hidePost]: {
                 action: () => this.handleOptionsAction('hide post', 'postDropdownHideBtn')
             },
+            [config.shortcuts.savePost]: {
+                action: this.savePost.bind(this)
+            },
             [config.shortcuts.blockAccount]: {
                 action: () => this.handleOptionsAction('block account', 'postDropdownBlockBtn')
             },
@@ -200,7 +203,7 @@ class BlueSkyShortcuts {
             }
 
             this.logger.debug('Navigating to:', path);
-            
+
             window.location.href = `https://bsky.app${path}`;
 
             this.handleNavigation(path);
@@ -221,7 +224,7 @@ class BlueSkyShortcuts {
         }
 
         const isFeedView = newPath === '/' || newPath.startsWith('/profile/');
-        this.appState.updateState({ 
+        this.appState.updateState({
             location: newPath,
             currentController: null,
             ...(isFeedView ? {} : { currentPost: null, currentLinkIndex: -1 })
@@ -318,20 +321,20 @@ class BlueSkyShortcuts {
             const viewportHeight = window.innerHeight;
             const scrollTop = window.scrollY;
             const viewportCenter = scrollTop + (viewportHeight / 2);
-            
+
             // Find post closest to the center of the viewport
             let targetPost = visiblePosts.reduce((closest, post) => {
                 const rect = post.getBoundingClientRect();
                 const postCenter = rect.top + (rect.height / 2) + window.scrollY;
-                
+
                 if (!closest) return post;
-                
-                const closestCenter = closest.getBoundingClientRect().top + 
-                                    (closest.getBoundingClientRect().height / 2) + 
+
+                const closestCenter = closest.getBoundingClientRect().top +
+                                    (closest.getBoundingClientRect().height / 2) +
                                     window.scrollY;
-                
+
                 // Use distance to viewport center as the metric
-                return Math.abs(postCenter - viewportCenter) < 
+                return Math.abs(postCenter - viewportCenter) <
                     Math.abs(closestCenter - viewportCenter) ? post : closest;
             }, null);
 
@@ -405,6 +408,43 @@ class BlueSkyShortcuts {
             });
     }
 
+    savePost() {
+        const { currentPost } = this.appState.state;
+        if (!currentPost) return;
+
+        let saveBtn =
+            currentPost.querySelector('[aria-label*="Add to saved posts"]') ??
+            currentPost.querySelector('[aria-label*="Remove from saved posts"]')
+
+        if (saveBtn) {
+            let toggledPost = currentPost
+
+            // If the saved post was removed from the feed, move selection to the previous post
+            let observer = new MutationObserver((mutationList, observer) => {
+                for (const mutation of mutationList) {
+                    // Filter: ignore svg effects
+                    let did_remove_post = [...mutation.removedNodes].some(n => n.contains(toggledPost))
+                    if (did_remove_post) {
+                        this.appState.updateState({
+                            currentPost: mutation.previousSibling,
+                            currentLinkIndex: -1
+                        });
+                        return
+                    }
+                }
+            });
+
+            observer.observe(document.body, {childList: true, subtree: true})
+
+            saveBtn?.click()
+
+            setTimeout(() => {
+                // Saved post wasn't removed from any lists (or we already fired)
+                observer.disconnect()
+            }, 1000);
+        }
+    }
+
     cycleFeed(event) {
         const { feedTabs, currentFeedIndex } = this.appState.state;
 
@@ -416,7 +456,7 @@ class BlueSkyShortcuts {
         const direction = event.shiftKey ? -1 : 1;
         const newIndex = (currentFeedIndex + direction + feedTabs.length) % feedTabs.length;
         const targetTab = feedTabs[newIndex];
-        
+
         if (!targetTab?.element) {
             this.logger.error('Invalid feed tab');
             return;
@@ -538,7 +578,7 @@ class BlueSkyShortcuts {
                     reject(error);
                 }
             });
-        }); 
+        });
     }
 
     openPost() {
@@ -547,10 +587,10 @@ class BlueSkyShortcuts {
             return;
         }
 
-        const focusedPost = document.activeElement.matches('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]') 
-            ? document.activeElement 
+        const focusedPost = document.activeElement.matches('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]')
+            ? document.activeElement
             : this.appState.state.currentPost;
-        
+
         if (!focusedPost || !DOMUtils.isValidElement(focusedPost)) {
             this.logger.debug('No valid focused post, attempting to select first visible post');
             return this.selectNearestVisiblePost();
@@ -575,7 +615,7 @@ class BlueSkyShortcuts {
 
     handleHighlightedLink() {
         const { currentPost, currentLinkIndex } = this.appState.state;
-        
+
         // If a link is focused via cycle links, click it
         if (currentLinkIndex !== -1 && currentPost) {
             const postContent = currentPost.querySelector('[data-testid*="postText"]');
@@ -590,7 +630,7 @@ class BlueSkyShortcuts {
                 }
             }
         }
-    
+
         // Check for highlighted link class
         const highlightedLink = document.querySelector('.bsky-highlighted-link');
         if (highlightedLink) {
@@ -599,7 +639,7 @@ class BlueSkyShortcuts {
             highlightedLink.classList.remove('bsky-highlighted-link');
             return true;
         }
-        
+
         return false;
     }
 
@@ -644,22 +684,22 @@ class BlueSkyShortcuts {
 
         if (loadPostsButton) {
             this.appState.updateState({ currentPost: null });
-            
+
             const { currentController } = this.appState.state;
             if (currentController) {
                 currentController.abort();
             }
-    
+
             const newController = new AbortController();
             this.appState.updateState({ currentController: newController });
 
             loadPostsButton.click();
-    
+
             try {
                 await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
                 await new Promise(resolve => setTimeout(resolve, 300));
                 const visiblePosts = DOMUtils.findVisiblePosts();
-                
+
                 if (visiblePosts.length > 0) {
                     const firstPost = visiblePosts[0];
                     this.logger.debug('Selecting first post after loading new posts:', firstPost);
@@ -737,19 +777,19 @@ class BlueSkyShortcuts {
                         setTimeout(async () => {
                             if (window.location.pathname === '/') {
                                 try {
-                                    // Remove the feed tab click listener 
+                                    // Remove the feed tab click listener
                                     const originalHandleFeedTabClick = this.handleFeedTabClick;
-                                    this.handleFeedTabClick = () => {}; 
-                                    
+                                    this.handleFeedTabClick = () => {};
+
                                     const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div', 2000);
-                                    
+
                                     const tabElements = [...tabContainer.children];
                                     if (tabElements.length > 0) {
                                         tabElements[0].click();
-                                        
+
                                         await new Promise(resolve => setTimeout(resolve, 100));
                                         await this.initializeFeedTabs(true);
-                                        
+
                                         this.appState.updateState({
                                             currentFeedIndex: 0,
                                             feedTabs: this.appState.state.feedTabs.map((tab, i) => ({
@@ -758,7 +798,7 @@ class BlueSkyShortcuts {
                                             }))
                                         });
                                     }
-                                    
+
                                     // Restore the original handler
                                     this.handleFeedTabClick = originalHandleFeedTabClick;
                                 } catch (error) {
