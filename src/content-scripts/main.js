@@ -418,7 +418,6 @@ class BlueSkyShortcuts {
 
         if (saveBtn) {
             let toggledPost = currentPost
-            let previousPost = currentPost.parentElement.previousElementSibling.querySelector('div[role="link"]')
 
             // If the saved post was removed from the feed, move selection to the previous post
             let observer = new MutationObserver((mutationList, observer) => {
@@ -426,7 +425,6 @@ class BlueSkyShortcuts {
                     // Filter: ignore svg effects
                     let did_remove_post = [...mutation.removedNodes].some(n => n.contains(toggledPost))
                     if (did_remove_post) {
-                        console.log(toggledPost, this.appState.state.currentPost, previousPost)
                         this.appState.updateState({
                             currentPost: mutation.previousSibling,
                             currentLinkIndex: -1
