@@ -57,6 +57,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 | <kbd>m</kbd>                    | Mute account                       |
 | <kbd>x</kbd>                    | Report post                        |
 | <kbd>y</kbd>                    | Copy post text                     |
+| <kbd>s</kbd>                    | Save post                          |
 
 ### Application
 | Key                             | Action                             |
