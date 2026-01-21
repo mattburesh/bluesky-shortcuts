@@ -616,21 +616,6 @@ class BlueSkyShortcuts {
     handleHighlightedLink() {
         const { currentPost, currentLinkIndex } = this.appState.state;
 
-        // If a link is focused via cycle links, click it
-        if (currentLinkIndex !== -1 && currentPost) {
-            const postContent = currentPost.querySelector('[data-testid*="postText"]');
-            if (postContent) {
-                const links = [...postContent.querySelectorAll('a[role="link"]')];
-                const targetLink = links[currentLinkIndex];
-                if (targetLink) {
-                    targetLink.click();
-                    targetLink.classList.remove('bsky-highlighted-link');
-                    this.appState.updateState({ currentLinkIndex: -1 });
-                    return true;
-                }
-            }
-        }
-
         // Check for highlighted link class
         const highlightedLink = document.querySelector('.bsky-highlighted-link');
         if (highlightedLink) {
