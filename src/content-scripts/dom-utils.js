@@ -32,7 +32,6 @@ export default class DOMUtils {
                 }
 
                 retryCount++;
-                console.log('retry ' + retryCount );
                 await new Promise(resolve => setTimeout(resolve, retryOptions.retryDelay));
                 return attempt();
             }

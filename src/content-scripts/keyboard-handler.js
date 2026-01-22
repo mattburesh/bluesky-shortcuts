@@ -3,11 +3,6 @@ export default class KeyboardShortcutManager {
         this.actionMap = actionMap;
         this.prefixKey = null;
         this.prefixTimeout = null;
-
-        console.log('Enter key mapped as:', Object.keys(actionMap).find(key => 
-            actionMap[key] && actionMap[key].action && 
-            actionMap[key].action.name === 'bound openPost'));
-
         this.setupListeners();
     }
 
