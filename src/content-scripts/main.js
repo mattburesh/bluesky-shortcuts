@@ -822,7 +822,6 @@ class BlueSkyShortcuts {
 
     goUserProfile() {
         const { currentPost } = this.appState.state;
-        console.log('go to profile');
 
         try {
             if (currentPost) {
