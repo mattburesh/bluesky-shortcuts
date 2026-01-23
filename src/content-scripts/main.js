@@ -359,9 +359,7 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        let like =
-            currentPost.querySelector('[aria-label*="Like ("]') ??
-            currentPost.querySelector('[aria-label*="Unlike ("]')
+        const like = currentPost.querySelector('[data-testid="likeBtn"]');
         like?.click()
     }
 
@@ -369,7 +367,7 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        let reply = currentPost.querySelector('[aria-label*="Reply ("]')
+        const reply = currentPost.querySelector('[data-testid="replyBtn"]');
         reply?.click()
     }
 
@@ -377,7 +375,7 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        const repostButton = currentPost.querySelector('[aria-label="Repost or quote post"]');
+        const repostButton = currentPost.querySelector('[data-testid="repostBtn"]');
         if (!repostButton) {
             this.logger.warn('Repost button not found');
             return;
@@ -390,16 +388,10 @@ class BlueSkyShortcuts {
                 const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
 
                 if (event.shiftKey) {
-                    const quoteItem = menuArray.find(item => item.getAttribute('aria-label') === 'Quote post');
-                    if (quoteItem) {
-                        quoteItem.click();
-                    }
+                    const quoteItem = menuArray.find(item => item.getAttribute('data-testid') === 'repostDropdownQuoteBtn');
+                    quoteItem?.click();
                 } else {
-                    const repostItem = menuArray.find(item =>
-                        item.getAttribute('aria-label') === 'Repost' ||
-                        item.getAttribute('aria-label') === 'Undo repost'
-                    );
-
+                    const repostItem = menuArray.find(item => item.getAttribute('data-testid') === 'repostDropdownRepostBtn');
                     repostItem?.click();
                 }
             })
@@ -412,9 +404,7 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        let saveBtn =
-            currentPost.querySelector('[aria-label*="Add to saved posts"]') ??
-            currentPost.querySelector('[aria-label*="Remove from saved posts"]')
+        const saveBtn = currentPost.querySelector('[data-testid="postBookmarkBtn"]');
 
         if (saveBtn) {
             let toggledPost = currentPost
@@ -870,12 +860,12 @@ class BlueSkyShortcuts {
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        const optionsButton = currentPost.querySelector('[aria-label="Open post options menu"]');
-        if (!optionsButton) {
+        const optionsBtn = currentPost.querySelector('[data-testid="postDropdownBtn"]');
+        if (!optionsBtn) {
             return false;
         }
 
-        optionsButton.click();
+        optionsBtn.click();
         return true;
     }
 
