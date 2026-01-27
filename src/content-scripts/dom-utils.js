@@ -66,6 +66,10 @@ export default class DOMUtils {
     }
 
     static findClosestVisiblePost(visiblePosts, scrollY) {
+        if (visiblePosts.length === 0) {
+            return null
+        }
+        
         return visiblePosts.reduce((closest, post) => {
             const postTop = post.getBoundingClientRect().top + scrollY;
             const closestTop = closest.getBoundingClientRect().top + scrollY;

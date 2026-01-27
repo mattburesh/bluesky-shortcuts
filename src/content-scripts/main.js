@@ -238,8 +238,8 @@ class BlueSkyShortcuts {
 
         setTimeout(() => {
             this.selectNearestVisiblePost().catch(error => {
-                    this.logger.error('Failed to select nearest post', error);
-                });
+                this.logger.error('Failed to select nearest post', error);
+            });
         }, 50);
     }
 
@@ -330,8 +330,8 @@ class BlueSkyShortcuts {
                 if (!closest) return post;
 
                 const closestCenter = closest.getBoundingClientRect().top +
-                                    (closest.getBoundingClientRect().height / 2) +
-                                    window.scrollY;
+                    (closest.getBoundingClientRect().height / 2) +
+                    window.scrollY;
 
                 // Use distance to viewport center as the metric
                 return Math.abs(postCenter - viewportCenter) <
@@ -424,7 +424,7 @@ class BlueSkyShortcuts {
                 }
             });
 
-            observer.observe(document.body, {childList: true, subtree: true})
+            observer.observe(document.body, { childList: true, subtree: true })
 
             saveBtn?.click()
 
@@ -504,7 +504,7 @@ class BlueSkyShortcuts {
         let newIndex = currentLinkIndex + direction;
 
         if (newIndex >= links.length) newIndex = -1;
-        if (newIndex < -1) newIndex = links.length -1;
+        if (newIndex < -1) newIndex = links.length - 1;
 
         if (newIndex === -1) {
             this.appState.updateState({ currentLinkIndex: -1 });
@@ -549,25 +549,25 @@ class BlueSkyShortcuts {
 
         return new Promise((resolve, reject) => {
             DOMUtils.waitForElement(feedSelector, 5000, controller.signal)
-            .then(feed => {
-                return new Promise(r => setTimeout(r, 100))
-                    .then(() => feed);
-            })
-            .then(feed => {
-                const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
-                if (firstPost) {
-                    this.appState.updateState({ currentPost: firstPost });
-                    resolve(firstPost);
-                } else {
-                    reject(new Error('No posts found after feed load'));
-                }
-            })
-            .catch(error => {
-                if (error !== 'cancelled') {
-                    this.logger.error('Failed to load feed', error);
-                    reject(error);
-                }
-            });
+                .then(feed => {
+                    return new Promise(r => setTimeout(r, 100))
+                        .then(() => feed);
+                })
+                .then(feed => {
+                    const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
+                    if (firstPost) {
+                        this.appState.updateState({ currentPost: firstPost });
+                        resolve(firstPost);
+                    } else {
+                        reject(new Error('No posts found after feed load'));
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'cancelled') {
+                        this.logger.error('Failed to load feed', error);
+                        reject(error);
+                    }
+                });
         });
     }
 
@@ -632,18 +632,19 @@ class BlueSkyShortcuts {
     }
 
     focusSearch() {
-        const searchInput = document.querySelector('input[aria-label="Search"]');
+        const selector = 'input[role="search"], input[enterkeyhint="search"], input[aria-label="Search"]';
+        const searchInput = document.querySelector(selector);
         if (searchInput) {
             searchInput.focus();
             searchInput.select();
             return;
         }
 
-        const searchAnchor = document.querySelector('a[aria-label="Search"]');
+        const searchAnchor = document.querySelector('a[href="/search"]');
         if (searchAnchor) {
             searchAnchor.click();
 
-            DOMUtils.waitForElement('input[aria-label="Search"]')
+            DOMUtils.waitForElement(selector)
                 .then(element => {
                     element.focus();
                     element.select();
@@ -655,7 +656,7 @@ class BlueSkyShortcuts {
     }
 
     async loadMore() {
-        const loadPostsButton = document.querySelector( 'div[data-testid="loadLatestBtn"] button') ?? null;
+        const loadPostsButton = document.querySelector('div[data-testid="loadLatestBtn"] button') ?? null;
 
         if (loadPostsButton) {
             this.appState.updateState({ currentPost: null });
@@ -754,7 +755,7 @@ class BlueSkyShortcuts {
                                 try {
                                     // Remove the feed tab click listener
                                     const originalHandleFeedTabClick = this.handleFeedTabClick;
-                                    this.handleFeedTabClick = () => {};
+                                    this.handleFeedTabClick = () => { };
 
                                     const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div', 2000);
 
