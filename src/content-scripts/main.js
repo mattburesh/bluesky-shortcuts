@@ -640,7 +640,7 @@ class BlueSkyShortcuts {
             return;
         }
 
-        const anchorSelector = 'a[href="/search"][aria-label="Explore"]';
+        const anchorSelector = 'a[href="/search"]';
         const searchAnchor = document.querySelector(anchorSelector);
         if (searchAnchor) {
             searchAnchor.click();
