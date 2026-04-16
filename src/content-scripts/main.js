@@ -415,8 +415,12 @@ class BlueSkyShortcuts {
                     // Filter: ignore svg effects
                     let did_remove_post = [...mutation.removedNodes].some(n => n.contains(toggledPost))
                     if (did_remove_post) {
+                        // Select the previous sibling's post as the current post.
+                        // (It is not guaranteed to be mutation.previousSibling, but should overlap it.)
+                        const visiblePosts = DOMUtils.findVisiblePosts();
+                        const previousPost = DOMUtils.findPostByCurrentPosition(visiblePosts, mutation.previousSibling);
                         this.appState.updateState({
-                            currentPost: mutation.previousSibling,
+                            currentPost: previousPost,
                             currentLinkIndex: -1
                         });
                         return
