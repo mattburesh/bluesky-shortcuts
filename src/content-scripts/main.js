@@ -567,7 +567,10 @@ class BlueSkyShortcuts {
                     }
                 })
                 .catch(error => {
-                    if (error !== 'cancelled') {
+                    if (error === 'cancelled') {
+                        this.logger.error('Cancelled loading feed', error);
+                        resolve(null);
+                    } else {
                         this.logger.error('Failed to load feed', error);
                         reject(error);
                     }
