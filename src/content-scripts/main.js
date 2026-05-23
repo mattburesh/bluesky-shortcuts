@@ -579,7 +579,6 @@ class BlueSkyShortcuts {
     }
 
     openPost() {
-        const { currentPost } = this.appState.state;
         if (this.handleHighlightedLink()) {
             return;
         }
@@ -593,10 +592,11 @@ class BlueSkyShortcuts {
             return this.selectNearestVisiblePost();
         }
 
-        const postLinks = [...currentPost.querySelectorAll('a[role="link"]')];
+        const postLinks = [...focusedPost.querySelectorAll('a[role="link"]')];
 
         const postLink = postLinks.find(link =>
-            /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-zA-Z0-9]+$/.test(link.href)
+            /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-zA-Z0-9]+$/.test(link.href) &&
+            link.href !== window.location.href
         );
 
         if (postLink) {
@@ -606,6 +606,16 @@ class BlueSkyShortcuts {
             postLink.click();
             this.handleNavigation(postLink.pathname);
         } else {
+            // Fallback for embedded quote posts, which renders as div[role="link"]
+            const quoteEmbed = focusedPost.querySelector('[role="link"][aria-label^="Post by "]');
+            if (quoteEmbed) {
+                document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+                    el.classList.remove('bsky-highlighted-post');
+                });
+                quoteEmbed.click();
+                setTimeout(() => this.handleNavigation(window.location.pathname), 100);
+                return;
+            }
             this.logger.warn('No valid post link found');
         }
     }

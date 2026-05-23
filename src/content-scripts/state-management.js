@@ -75,7 +75,8 @@ class AppState {
      * @param {Object} newState - Partial state object to merge with current state
      */
     updateState(newState) {
-        this.state = { ...this.state, ...newState };
+        const patch = typeof newState === 'function' ? newState(this.state) : newState;
+        this.state = { ...this.state, ...patch };
         this.notifySubscribers();
     }
 
