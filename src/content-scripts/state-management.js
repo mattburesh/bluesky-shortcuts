@@ -76,7 +76,9 @@ class AppState {
      */
     updateState(newState) {
         const patch = typeof newState === 'function' ? newState(this.state) : newState;
-        this.state = { ...this.state, ...patch };
+        const next = { ...this.state, ...patch };
+        if (Object.keys(patch).every(k => this.state[k] === next[k])) return;
+        this.state = next;
         this.notifySubscribers();
     }
 
