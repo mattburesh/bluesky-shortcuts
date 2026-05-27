@@ -53,9 +53,15 @@ class BlueSkyShortcuts {
     setupEventListeners() {
         this.boundCleanup = () => this.cleanup();
         this.boundHandleNavigation = () => this.handleNavigation(window.location.pathname);
+        this.boundHandleVisibilityChange = () => {
+            if (!document.hidden && window.location.pathname === '/') {
+                this.initializeFeedTabs(true);
+            }
+        };
 
         window.addEventListener('unload', this.boundCleanup);
         window.addEventListener('popstate', this.boundHandleNavigation);
+        document.addEventListener('visibilitychange', this.boundHandleVisibilityChange);
     }
 
     async waitForAppLoad() {
@@ -908,6 +914,7 @@ class BlueSkyShortcuts {
 
         window.removeEventListener('unload', this.boundCleanup);
         window.removeEventListener('popstate', this.boundHandleNavigation);
+        document.removeEventListener('visibilitychange', this.boundHandleVisibilityChange);
 
         this.logger.debug('Cleanup complete');
     }
