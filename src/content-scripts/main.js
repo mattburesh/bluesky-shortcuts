@@ -725,36 +725,43 @@ class BlueSkyShortcuts {
     }
 
     async loadMore() {
+        // Prefer the "New posts" pill when present. Fall back to clicking the active feed tab. 
         const loadPostsButton = document.querySelector('div[data-testid="loadLatestBtn"] button') ?? null;
+        const { feedTabs, currentFeedIndex } = this.appState.state;
+        const activeTab = feedTabs?.[currentFeedIndex]?.element ?? null;
+        const refreshTarget = loadPostsButton ?? (DOMUtils.isValidElement(activeTab) ? activeTab : null);
 
-        if (loadPostsButton) {
-            this.appState.updateState({ currentPost: null });
+        if (!refreshTarget) {
+            this.logger.debug('Nothing to refresh: no load-latest button and no active feed tab');
+            return;
+        }
 
-            const { currentController } = this.appState.state;
-            if (currentController) {
-                currentController.abort();
+        this.appState.updateState({ currentPost: null });
+
+        const { currentController } = this.appState.state;
+        if (currentController) {
+            currentController.abort();
+        }
+
+        const newController = new AbortController();
+        this.appState.updateState({ currentController: newController });
+
+        refreshTarget.click();
+
+        try {
+            await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
+            await new Promise(resolve => setTimeout(resolve, 300));
+            const visiblePosts = DOMUtils.findVisiblePosts();
+
+            if (visiblePosts.length > 0) {
+                const firstPost = visiblePosts[0];
+                this.logger.debug('Selecting first post after loading new posts:', firstPost);
+                this.appState.updateState({ currentPost: firstPost });
+                DOMUtils.safelyScrollIntoView(firstPost);
             }
-
-            const newController = new AbortController();
-            this.appState.updateState({ currentController: newController });
-
-            loadPostsButton.click();
-
-            try {
-                await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
-                await new Promise(resolve => setTimeout(resolve, 300));
-                const visiblePosts = DOMUtils.findVisiblePosts();
-
-                if (visiblePosts.length > 0) {
-                    const firstPost = visiblePosts[0];
-                    this.logger.debug('Selecting first post after loading new posts:', firstPost);
-                    this.appState.updateState({ currentPost: firstPost });
-                    DOMUtils.safelyScrollIntoView(firstPost);
-                }
-            } catch (error) {
-                if (error !== 'cancelled') {
-                    this.logger.error('Failed to load new posts', error);
-                }
+        } catch (error) {
+            if (error !== 'cancelled') {
+                this.logger.error('Failed to load new posts', error);
             }
         }
     }
