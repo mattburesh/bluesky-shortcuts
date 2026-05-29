@@ -229,7 +229,8 @@ class BlueSkyShortcuts {
             this.appState.state.currentController.abort();
         }
 
-        const isFeedView = newPath === '/' || newPath.startsWith('/profile/');
+        const isPostThread = /^\/profile\/[^/]+\/post\//.test(newPath);
+        const isFeedView = newPath === '/' || (newPath.startsWith('/profile/') && !isPostThread);
         this.appState.updateState({
             location: newPath,
             currentController: null,
@@ -242,11 +243,37 @@ class BlueSkyShortcuts {
             });
         }
 
-        setTimeout(() => {
-            this.selectNearestVisiblePost().catch(error => {
-                this.logger.error('Failed to select nearest post', error);
-            });
-        }, 50);
+        if (isPostThread) {
+            const controller = new AbortController();
+            this.appState.updateState({ currentController: controller });
+            DOMUtils.waitForElement('[data-testid*="postThreadItem-by-"]', 5000, controller.signal)
+                .then(() => new Promise(resolve => setTimeout(resolve, 200)))
+                .then(() => {
+                    if (controller.signal.aborted) return;
+                    const currentUrl = window.location.href;
+                    const threadItems = [...document.querySelectorAll('[data-testid*="postThreadItem-by-"]')]
+                        .filter(el => el.offsetParent !== null);
+                    const mainPost = threadItems.find(item =>
+                        [...item.querySelectorAll('a[href]')].some(a => a.href === currentUrl)
+                    ) || threadItems[0];
+                    if (mainPost) {
+                        this.resetFocus();
+                        this.appState.updateState({ currentPost: mainPost, currentLinkIndex: -1 });
+                        DOMUtils.safelyScrollIntoView(mainPost, { skipScroll: true });
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'cancelled') {
+                        this.logger.error('Failed to select post in thread', error);
+                    }
+                });
+        } else {
+            setTimeout(() => {
+                this.selectNearestVisiblePost().catch(error => {
+                    this.logger.error('Failed to select nearest post', error);
+                });
+            }, 50);
+        }
     }
 
     moveToNextPost() {
@@ -480,7 +507,7 @@ class BlueSkyShortcuts {
 
     cycleLink(event) {
         const { currentPost, currentLinkIndex } = this.appState.state;
-        if (!currentPost) return;
+        if (!currentPost ||!DOMUtils.isValidElement(currentPost)) return;
 
         this.logger.debug('Cylcling links');
 
@@ -493,17 +520,35 @@ class BlueSkyShortcuts {
             '[data-testid*="postThreadItem-by-"] > div:last-child > div:last-child > div:nth-child(2)'
         ]
 
-        /**
-        * Find all links within a post's content area.
-        * Uses contentSelectors to target both feed posts and thread posts.
-        * Returns first non-empty array of links found, or an empty array if none exist.
-        */
-        const links = contentSelectors
-            .reduce((foundLinks, selector) => {
-                if (foundLinks.length) return foundLinks;
-                const content = currentPost.querySelector(selector);
-                return content ? [...content.querySelectorAll('a[role="link"][href]')] : [];
-            }, []);
+        let foundContainer = false;
+        let links = [];
+
+        for (const selector of contentSelectors) {
+            const content = currentPost.querySelector(selector);
+            if (content) {
+                foundContainer = true;
+                links = [...content.querySelectorAll('a[role="link"][href]')];
+                if (links.length) break;
+            }
+        }
+
+        // Fallback for thread items where postText may be absent despite having inline links. 
+        if (!foundContainer && currentPost.matches('[data-testid*="postThreadItem-by-"]')) {
+            // The first child div is the header row (avatar + display name). Exclude its
+            // links so profile links don't get cycled. Then dedupe by first occurrence.
+            const header = currentPost.querySelector(':scope > div:first-child');
+            const seenHrefs = new Set();
+            links = [...currentPost.querySelectorAll('a[role="link"][href]')]
+                .filter(link =>
+                    !header?.contains(link) &&
+                    !/\/profile\/[^/]+\/post\//.test(link.href)
+                )
+                .filter(link => {
+                    if (seenHrefs.has(link.href)) return false;
+                    seenHrefs.add(link.href);
+                    return true;
+                });
+        }
 
         if (!links.length) {
             this.logger.debug('No links found in post.');
