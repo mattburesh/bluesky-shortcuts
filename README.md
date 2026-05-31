@@ -11,18 +11,18 @@ A browser extension for adding shortcuts to bsky.app.
 
 ### Firefox
 
-1. Make sure your `Node.js` version is >= 16
+1. Run `nvm install` to install Node v24.16.0
 2. Run `npm install`
-3. Run `npx webpack --config webpack.config.js`
+3. Run `npm run build:firefox`
 4. Visit the [firefox addon debugging page](about:debugging#/runtime/this-firefox)
     1. (or enter `about:debugging#/runtime/this-firefox` in the address bar)
 5. Click `Load Temporary Add-on`, and select `bsky-shortcuts/build`
 
 ### Chrome
 
-1. Make sure your `Node.js` version is >= 16
-2. run 'npm install'
-3. run `npx webpack --config webpack.config.js`
+1. Run `nvm install` to install Node v24.16.0
+2. run `npm install`
+3. run `npm run build:chrome`
 4. Visit the [chrome extensions page](chrome://extensions/)
     1. (or enter `chrome://extensions/` in the Chrome address bar)
 5. Enable `Developer mode` in the top right
