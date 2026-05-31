@@ -167,4 +167,27 @@ export default class DOMUtils {
                element.isConnected &&
                element.offsetParent != null
     }
+
+    static getFeedTabSelector() {
+        return window.location.pathname === '/'
+            ? '[data-testid="homeScreenFeedTabs"] > div > div'
+            : 'div[role="tablist"] div[role="tab"]';
+    }
+
+    static getFeedTabs() {
+        if (window.location.pathname === '/') {
+            const homeTabs = document.querySelector('[data-testid="homeScreenFeedTabs"] > div > div');
+            return homeTabs ? [...homeTabs.children] : [];
+        }
+
+        const tablist = [...document.querySelectorAll('div[role="tablist"]')].find(list =>
+            list.offsetParent !== null &&
+            !list.closest('[data-testid="homeScreenFeedTabs"]')
+        );
+        return tablist ? [...tablist.querySelectorAll('div[role="tab"]')] : [];
+    }
+
+    static isFeedTabActive(tab) {
+        return !!tab.querySelector('div[style*="background-color"]');
+    }
 }

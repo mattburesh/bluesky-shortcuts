@@ -79,8 +79,8 @@ class BlueSkyShortcuts {
         this._initializing = true;
 
         try {
-            const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div');
-            const feedTabs = [...tabContainer.children].map((tab, index) => {
+            await DOMUtils.waitForElement(DOMUtils.getFeedTabSelector());
+            const feedTabs = DOMUtils.getFeedTabs().map((tab, index) => {
                 if (!tab._hasClickListener) {
                     tab.addEventListener('click', () => {
                         this.handleFeedTabClick(index);
@@ -90,7 +90,7 @@ class BlueSkyShortcuts {
 
                 return {
                     element: tab,
-                    isActive: !!tab.firstChild.querySelector('div[style*="background-color"]')
+                    isActive: DOMUtils.isFeedTabActive(tab)
                 };
             });
             // Only update the state if it hasn't been initialized yet
@@ -237,10 +237,20 @@ class BlueSkyShortcuts {
             ...(isFeedView ? {} : { currentPost: null, currentLinkIndex: -1 })
         });
 
-        if (newPath === '/') {
-            this.initializeFeedTabs(forceUpdate).catch(error => {
+        const hasFeedTabs = newPath === '/' ||
+            newPath.startsWith('/hashtag/') ||
+            newPath.startsWith('/search');
+
+        if (hasFeedTabs) {
+            // Home tabs persist across SPA navigation, but hashtag/search tabs are
+            // recreated on each visit, so always refresh the stored references.
+            this.initializeFeedTabs(true).catch(error => {
                 this.logger.error('Failed to initialize feed tabs after navigation', error);
             });
+        } else if (this.appState.state.feedTabs?.length) {
+            // Leaving a tabbed view: drop stale references so cycleFeed doesn't
+            // click detached tab elements from the previous page.
+            this.appState.updateState({ feedTabs: [], currentFeedIndex: 0 });
         }
 
         if (isPostThread) {
@@ -473,18 +483,27 @@ class BlueSkyShortcuts {
     }
 
     cycleFeed(event) {
-        const { feedTabs, currentFeedIndex } = this.appState.state;
+        const tabElements = DOMUtils.getFeedTabs();
 
-        if (!feedTabs.length) {
+        if (!tabElements.length) {
             this.logger.warn('No feed tabs available');
             return;
         }
 
-        const direction = event.shiftKey ? -1 : 1;
-        const newIndex = (currentFeedIndex + direction + feedTabs.length) % feedTabs.length;
-        const targetTab = feedTabs[newIndex];
+        const { feedTabs, currentFeedIndex } = this.appState.state;
+        const storedMatches = feedTabs.length === tabElements.length &&
+            feedTabs.every((tab, i) => tab.element === tabElements[i]);
 
-        if (!targetTab?.element) {
+        let activeIndex = storedMatches
+            ? currentFeedIndex
+            : tabElements.findIndex(tab => DOMUtils.isFeedTabActive(tab));
+        if (activeIndex === -1) activeIndex = 0;
+
+        const direction = event.shiftKey ? -1 : 1;
+        const newIndex = (activeIndex + direction + tabElements.length) % tabElements.length;
+        const targetTab = tabElements[newIndex];
+
+        if (!targetTab) {
             this.logger.error('Invalid feed tab');
             return;
         }
@@ -492,15 +511,15 @@ class BlueSkyShortcuts {
         this.appState.updateState({
             currentFeedIndex: newIndex,
             currentPost: null,
-            feedTabs: feedTabs.map((tab, i) => ({
-                ...tab,
+            feedTabs: tabElements.map((element, i) => ({
+                element,
                 isActive: i === newIndex
             }))
         });
 
         const loadPromise = this.waitForFeedLoad();
 
-        targetTab.element.click();
+        targetTab.click();
 
         return loadPromise;
     }
