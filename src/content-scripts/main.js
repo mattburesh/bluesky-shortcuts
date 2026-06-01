@@ -179,6 +179,9 @@ class BlueSkyShortcuts {
             [config.shortcuts.goSettings]: {
                 action: () => this.navigateTo('/settings')
             },
+            [config.shortcuts.followUser]: {
+                action: this.followUser.bind(this)
+            },
             [config.shortcuts.hidePost]: {
                 action: () => this.handleOptionsAction('hide post', 'postDropdownHideBtn')
             },
@@ -482,6 +485,17 @@ class BlueSkyShortcuts {
         }
     }
 
+    followUser() {
+        if (!window.location.pathname.startsWith('/search')) return;
+        if (DOMUtils.getActiveTabText() !== 'People') return;
+
+        const { currentPost } = this.appState.state;
+        if (!currentPost) return;
+
+        const followBtn = currentPost.querySelector('button[aria-label*="Follow"]');
+        followBtn?.click();
+    }
+
     cycleFeed(event) {
         const tabElements = DOMUtils.getFeedTabs();
 
@@ -633,7 +647,7 @@ class BlueSkyShortcuts {
                         this.appState.updateState({ currentPost: firstPost });
                         resolve(firstPost);
                     } else {
-                        reject(new Error('No posts found after feed load'));
+                        resolve(null);
                     }
                 })
                 .catch(error => {
@@ -660,6 +674,16 @@ class BlueSkyShortcuts {
         if (!focusedPost || !DOMUtils.isValidElement(focusedPost)) {
             this.logger.debug('No valid focused post, attempting to select first visible post');
             return this.selectNearestVisiblePost();
+        }
+
+        // People/Feeds tab cards 
+        if (focusedPost.tagName === 'A' && focusedPost.href) {
+            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
+                el.classList.remove('bsky-highlighted-post');
+            });
+            focusedPost.click();
+            this.handleNavigation(focusedPost.pathname);
+            return;
         }
 
         const postLinks = [...focusedPost.querySelectorAll('a[role="link"]')];

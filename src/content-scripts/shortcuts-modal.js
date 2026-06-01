@@ -15,12 +15,13 @@ class ShortcutsModal {
             {
                 title: 'Post Actions',
                 shortcuts: [
-                    { key: 'Enter', description: 'Open selected post/link' },
+                    { key: 'Enter', description: 'Open selected post / profile / feed' },
                     { key: 'l', description: 'Like post' },
                     { key: 'r', description: 'Reply to post' },
                     { key: 't', description: 'Repost post' },
                     { modifier: 'Shift', key: 't', description: 'Quote post' },
                     { key: 'o', description: 'Expand image' },
+                    { key: 'f', description: 'Follow / unfollow (People tab only)' },
                     { key: 'h', description: 'Hide post' },
                     { key: 's', description: 'Save post' },
                     { key: 'b', description: 'Block account' },

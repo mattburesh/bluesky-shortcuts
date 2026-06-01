@@ -41,6 +41,19 @@ export default class DOMUtils {
     }
 
     static findVisiblePosts() {
+        // Handle People/Feeds tabs on the search page
+        if (window.location.pathname.startsWith('/search')) {
+            const activeTabText = DOMUtils.getActiveTabText();
+            if (activeTabText === 'People') {
+                return [...document.querySelectorAll('a[role="link"][aria-label^="View "]')]
+                    .filter(el => el.offsetParent !== null);
+            }
+            if (activeTabText === 'Feeds') {
+                return [...document.querySelectorAll('a[role="link"][href*="/feed/"]')]
+                    .filter(el => el.offsetParent !== null);
+            }
+        }
+
         var searchResults = []
         const feedPatterns = [
             /Hashtag — Bluesky$/,
@@ -63,6 +76,12 @@ export default class DOMUtils {
         ].filter(el => el.offsetParent !== null);
 
         return feedItems;
+    }
+
+    static getActiveTabText() {
+        const tabs = DOMUtils.getFeedTabs();
+        const activeTab = tabs.find(tab => DOMUtils.isFeedTabActive(tab));
+        return activeTab?.textContent?.trim() || '';
     }
 
     static findClosestVisiblePost(visiblePosts, scrollY) {
