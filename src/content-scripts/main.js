@@ -266,9 +266,16 @@ class BlueSkyShortcuts {
                     const currentUrl = window.location.href;
                     const threadItems = [...document.querySelectorAll('[data-testid*="postThreadItem-by-"]')]
                         .filter(el => el.offsetParent !== null);
-                    const mainPost = threadItems.find(item =>
-                        [...item.querySelectorAll('a[href]')].some(a => a.href === currentUrl)
-                    ) || threadItems[0];
+                    const targetRkey = newPath.split('/').pop();
+                    const targetHandle = newPath.match(/\/profile\/([^/]+)\/post\//)?.[1];
+                    const mainPost = threadItems.find(item => {
+                        const links = [...item.querySelectorAll('a[href]')];
+                        return links.some(a => a.href === currentUrl)
+                            || (targetRkey && links.some(a => a.href.includes(`/post/${targetRkey}`)));
+                    }) ?? (targetHandle
+                        ? threadItems.find(item => (item.getAttribute('data-testid') || '').includes(targetHandle))
+                        : null
+                    ) ?? threadItems[0];
                     if (mainPost) {
                         this.resetFocus();
                         this.appState.updateState({ currentPost: mainPost, currentLinkIndex: -1 });
