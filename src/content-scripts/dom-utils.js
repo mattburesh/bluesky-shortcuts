@@ -148,14 +148,37 @@ export default class DOMUtils {
             return;
         }
 
-        const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
-        const headerOffset = header ? header.offsetHeight + 12 : 60;
-
-        element.style.scrollMarginTop = `${headerOffset}px`;
+        element.style.scrollMarginTop = `${DOMUtils.getHeaderOffset()}px`;
         element.scrollIntoView({
             block: 'start',
             behavior: options.behavior || 'smooth'
         });
+    }
+
+    static getHeaderOffset() {
+        const feedTabs = document.querySelector('[data-testid="homeScreenFeedTabs"]');
+        if (feedTabs && feedTabs.offsetHeight > 0) {
+            return feedTabs.offsetHeight + 12;
+        }
+
+        const main = document.querySelector('[role="main"]');
+        if (main) {
+            let bottom = 0;
+            for (const el of main.querySelectorAll('div[style*="position: sticky"]')) {
+                const style = getComputedStyle(el);
+                if (style.position !== 'sticky' || parseInt(style.top, 10) !== 0) continue;
+
+                const rect = el.getBoundingClientRect();
+                if (rect.top <= 1 && rect.height > 0 && rect.height < 200 && rect.bottom > bottom) {
+                    bottom = rect.bottom;
+                }
+            }
+            if (bottom > 0) {
+                return bottom + 12;
+            }
+        }
+
+        return 60;
     }
 
     static findPostByCurrentPosition(visiblePosts, currentPost) {

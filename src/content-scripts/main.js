@@ -279,7 +279,7 @@ class BlueSkyShortcuts {
                     if (mainPost) {
                         this.resetFocus();
                         this.appState.updateState({ currentPost: mainPost, currentLinkIndex: -1 });
-                        DOMUtils.safelyScrollIntoView(mainPost, { skipScroll: true });
+                        DOMUtils.safelyScrollIntoView(mainPost, { behavior: 'instant' });
                     }
                 })
                 .catch(error => {
