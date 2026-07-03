@@ -16,6 +16,8 @@ class BlueSkyShortcuts {
 
         window.__bskyShortcuts = this;
 
+        this.lastNavigatedPath = window.location.pathname;
+
         this.appState = new AppState();
         this.initialize().catch(error => {
             this.logger.error('Failed to initialize extension: ', error);
@@ -227,6 +229,11 @@ class BlueSkyShortcuts {
 
     handleNavigation(newPath, forceUpdate = false) {
         this.logger.debug('Navigation occurred to:', newPath);
+
+        if (!forceUpdate && newPath === this.lastNavigatedPath) {
+            return;
+        }
+        this.lastNavigatedPath = newPath;
 
         if (this.appState.state.currentController) {
             this.appState.state.currentController.abort();
@@ -529,6 +536,7 @@ class BlueSkyShortcuts {
             return;
         }
 
+        DOMUtils.clearPostSelection();
         this.appState.updateState({
             currentFeedIndex: newIndex,
             currentPost: null,
@@ -620,6 +628,7 @@ class BlueSkyShortcuts {
             return;
         }
 
+        DOMUtils.clearPostSelection();
         this.appState.updateState({
             currentFeedIndex: index,
             currentPost: null,
@@ -644,19 +653,7 @@ class BlueSkyShortcuts {
 
         return new Promise((resolve, reject) => {
             DOMUtils.waitForElement(feedSelector, 5000, controller.signal)
-                .then(feed => {
-                    return new Promise(r => setTimeout(r, 100))
-                        .then(() => feed);
-                })
-                .then(feed => {
-                    const firstPost = feed.querySelector('div[data-testid*="feedItem-by-"]');
-                    if (firstPost) {
-                        this.appState.updateState({ currentPost: firstPost });
-                        resolve(firstPost);
-                    } else {
-                        resolve(null);
-                    }
-                })
+                .then(() => resolve())
                 .catch(error => {
                     if (error === 'cancelled') {
                         this.logger.error('Cancelled loading feed', error);
@@ -685,9 +682,7 @@ class BlueSkyShortcuts {
 
         // People/Feeds tab cards 
         if (focusedPost.tagName === 'A' && focusedPost.href) {
-            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
-                el.classList.remove('bsky-highlighted-post');
-            });
+            DOMUtils.clearPostSelection();
             focusedPost.click();
             this.handleNavigation(focusedPost.pathname);
             return;
@@ -701,18 +696,14 @@ class BlueSkyShortcuts {
         );
 
         if (postLink) {
-            document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
-                el.classList.remove('bsky-highlighted-post');
-            });
+            DOMUtils.clearPostSelection();
             postLink.click();
             this.handleNavigation(postLink.pathname);
         } else {
             // Fallback for embedded quote posts, which renders as div[role="link"]
             const quoteEmbed = focusedPost.querySelector('[role="link"][aria-label^="Post by "]');
             if (quoteEmbed) {
-                document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
-                    el.classList.remove('bsky-highlighted-post');
-                });
+                DOMUtils.clearPostSelection();
                 quoteEmbed.click();
                 setTimeout(() => this.handleNavigation(window.location.pathname), 100);
                 return;
@@ -1001,10 +992,6 @@ class BlueSkyShortcuts {
             element.classList.remove('bsky-highlighted-link');
             element.blur();
         })
-
-        document.querySelectorAll('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]').forEach(post => {
-            post.blur();
-        });
     }
 
     cleanup() {

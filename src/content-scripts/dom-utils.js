@@ -97,15 +97,10 @@ export default class DOMUtils {
     }
 
     /**
-     * Safely scroll into view
-     * @param {Element} element - The element to scroll into view
-     * @param {Object} options - The options for the scroll
-     * @param {boolean} options.skipScroll - Whether to skip the scroll
-     * @param {"smooth"|"instant"|"auto"} options.behavior - The behavior of the scroll. See [here](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo#behavior) for more information.
+     * Fully deselect any highlighted post: remove the highlight class, detach the
+     * Enter handler, drop any temporary tabindex, and blur the element.
      */
-    static safelyScrollIntoView(element, options = {}) {
-        if (!element) return;
-
+    static clearPostSelection() {
         document.querySelectorAll('.bsky-highlighted-post').forEach(el => {
             el.classList.remove('bsky-highlighted-post');
 
@@ -118,7 +113,22 @@ export default class DOMUtils {
                 el.removeAttribute('tabindex');
                 el.removeAttribute('data-bsky-temp-tabindex');
             }
+
+            el.blur();
         });
+    }
+
+    /**
+     * Safely scroll into view
+     * @param {Element} element - The element to scroll into view
+     * @param {Object} options - The options for the scroll
+     * @param {boolean} options.skipScroll - Whether to skip the scroll
+     * @param {"smooth"|"instant"|"auto"} options.behavior - The behavior of the scroll. See [here](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo#behavior) for more information.
+     */
+    static safelyScrollIntoView(element, options = {}) {
+        if (!element) return;
+
+        DOMUtils.clearPostSelection();
 
         element.classList.add('bsky-highlighted-post');
         if (element.getAttribute('tabindex') === null) {
