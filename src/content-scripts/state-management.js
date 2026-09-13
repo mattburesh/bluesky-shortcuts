@@ -1,6 +1,10 @@
 import Logger from '../utils/logger';
 
 class AppState {
+    static getCurrentPath() {
+        return window.location.pathname + window.location.search;
+    }
+
     constructor(logger) {
         this.state = {
             feedTabs: [],
@@ -8,7 +12,7 @@ class AppState {
             currentPost: null,
             currentLinkIndex: -1, // -1 = open selected post, n = open nth link in post
             currentController: null,
-            location: window.location.pathname,
+            location: AppState.getCurrentPath(),
             knownAccounts: [],
             lastAccount: null
         };
@@ -28,7 +32,7 @@ class AppState {
      * @private
      */
     setupLocationObserver() {
-        let lastPathname = window.location.pathname;
+        let lastPath = AppState.getCurrentPath();
         let lastUpdate = Date.now();
         const THROTTLE_MS = 100;
 
@@ -38,13 +42,13 @@ class AppState {
                 return;
             }
 
-            const currentPathname = window.location.pathname;
-            if (currentPathname !== lastPathname) {
-                lastPathname = currentPathname;
+            const currentPath = AppState.getCurrentPath();
+            if (currentPath !== lastPath) {
+                lastPath = currentPath;
                 lastUpdate = now;
                 this.updateState(prevState => ({
                     ...prevState,
-                    location: currentPathname
+                    location: currentPath
                 }));
             }
         });

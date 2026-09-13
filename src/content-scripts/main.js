@@ -16,7 +16,7 @@ class BlueSkyShortcuts {
 
         window.__bskyShortcuts = this;
 
-        this.lastNavigatedPath = window.location.pathname;
+        this.lastNavigatedPath = AppState.getCurrentPath();
 
         this.appState = new AppState();
         this.initialize().catch(error => {
@@ -54,7 +54,7 @@ class BlueSkyShortcuts {
 
     setupEventListeners() {
         this.boundCleanup = () => this.cleanup();
-        this.boundHandleNavigation = () => this.handleNavigation(window.location.pathname);
+        this.boundHandleNavigation = () => this.handleNavigation(AppState.getCurrentPath());
         this.boundHandleVisibilityChange = () => {
             if (!document.hidden && window.location.pathname === '/') {
                 this.initializeFeedTabs(true);
@@ -230,26 +230,30 @@ class BlueSkyShortcuts {
     handleNavigation(newPath, forceUpdate = false) {
         this.logger.debug('Navigation occurred to:', newPath);
 
-        if (!forceUpdate && newPath === this.lastNavigatedPath) {
+        const hasUnhandledNavigation = this.appState.state.location !== this.lastNavigatedPath;
+
+        if (!forceUpdate && !hasUnhandledNavigation && newPath === this.lastNavigatedPath) {
             return;
         }
         this.lastNavigatedPath = newPath;
+
+        const pathname = newPath.split('?')[0];
 
         if (this.appState.state.currentController) {
             this.appState.state.currentController.abort();
         }
 
-        const isPostThread = /^\/profile\/[^/]+\/post\//.test(newPath);
-        const isFeedView = newPath === '/' || (newPath.startsWith('/profile/') && !isPostThread);
+        const isPostThread = /^\/profile\/[^/]+\/post\//.test(pathname);
+        const isFeedView = pathname === '/' || (pathname.startsWith('/profile/') && !isPostThread);
         this.appState.updateState({
             location: newPath,
             currentController: null,
             ...(isFeedView ? {} : { currentPost: null, currentLinkIndex: -1 })
         });
 
-        const hasFeedTabs = newPath === '/' ||
-            newPath.startsWith('/hashtag/') ||
-            newPath.startsWith('/search');
+        const hasFeedTabs = pathname === '/' ||
+            pathname.startsWith('/hashtag/') ||
+            pathname.startsWith('/search');
 
         if (hasFeedTabs) {
             // Home tabs persist across SPA navigation, but hashtag/search tabs are
@@ -273,8 +277,8 @@ class BlueSkyShortcuts {
                     const currentUrl = window.location.href;
                     const threadItems = [...document.querySelectorAll('[data-testid*="postThreadItem-by-"]')]
                         .filter(el => el.offsetParent !== null);
-                    const targetRkey = newPath.split('/').pop();
-                    const targetHandle = newPath.match(/\/profile\/([^/]+)\/post\//)?.[1];
+                    const targetRkey = pathname.split('/').pop();
+                    const targetHandle = pathname.match(/\/profile\/([^/]+)\/post\//)?.[1];
                     const mainPost = threadItems.find(item => {
                         const links = [...item.querySelectorAll('a[href]')];
                         return links.some(a => a.href === currentUrl)
@@ -684,7 +688,7 @@ class BlueSkyShortcuts {
         if (focusedPost.tagName === 'A' && focusedPost.href) {
             DOMUtils.clearPostSelection();
             focusedPost.click();
-            this.handleNavigation(focusedPost.pathname);
+            this.handleNavigation(focusedPost.pathname + focusedPost.search);
             return;
         }
 
@@ -698,14 +702,14 @@ class BlueSkyShortcuts {
         if (postLink) {
             DOMUtils.clearPostSelection();
             postLink.click();
-            this.handleNavigation(postLink.pathname);
+            this.handleNavigation(postLink.pathname + postLink.search);
         } else {
             // Fallback for embedded quote posts, which renders as div[role="link"]
             const quoteEmbed = focusedPost.querySelector('[role="link"][aria-label^="Post by "]');
             if (quoteEmbed) {
                 DOMUtils.clearPostSelection();
                 quoteEmbed.click();
-                setTimeout(() => this.handleNavigation(window.location.pathname), 100);
+                setTimeout(() => this.handleNavigation(AppState.getCurrentPath()), 100);
                 return;
             }
             this.logger.warn('No valid post link found');
@@ -899,7 +903,7 @@ class BlueSkyShortcuts {
                                 }
                             }
 
-                            this.handleNavigation(window.location.pathname, true);
+                            this.handleNavigation(AppState.getCurrentPath(), true);
 
                             setTimeout(() => {
                                 this.selectNearestVisiblePost().catch(error => {
