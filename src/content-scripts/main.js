@@ -3,6 +3,7 @@ import KeyboardShortcutManager from './keyboard-handler';
 import ShortcutsModal from './shortcuts-modal';
 import DOMUtils from './dom-utils';
 import Logger from '../utils/logger';
+import Settings from '../utils/settings';
 import AppState from './state-management';
 import * as css from "../../assets/style.css";
 
@@ -26,7 +27,7 @@ class BlueSkyShortcuts {
 
     async initialize() {
         try {
-            await this.waitForAppLoad();
+            await Promise.all([this.waitForAppLoad(), Settings.load()]);
             this.logger.debug('App loaded, starting initialization');
 
             await this.initializeComponents();
@@ -290,7 +291,7 @@ class BlueSkyShortcuts {
                     if (mainPost) {
                         this.resetFocus();
                         this.appState.updateState({ currentPost: mainPost, currentLinkIndex: -1 });
-                        DOMUtils.safelyScrollIntoView(mainPost, { skipScroll: true });
+                        DOMUtils.safelyScrollIntoView(mainPost, { behavior: 'instant', onlyIfAligned: true });
                     }
                 })
                 .catch(error => {
@@ -381,26 +382,7 @@ class BlueSkyShortcuts {
                 return null
             }
 
-            // Get viewport dimensions
-            const viewportHeight = window.innerHeight;
-            const scrollTop = window.scrollY;
-            const viewportCenter = scrollTop + (viewportHeight / 2);
-
-            // Find post closest to the center of the viewport
-            let targetPost = visiblePosts.reduce((closest, post) => {
-                const rect = post.getBoundingClientRect();
-                const postCenter = rect.top + (rect.height / 2) + window.scrollY;
-
-                if (!closest) return post;
-
-                const closestCenter = closest.getBoundingClientRect().top +
-                    (closest.getBoundingClientRect().height / 2) +
-                    window.scrollY;
-
-                // Use distance to viewport center as the metric
-                return Math.abs(postCenter - viewportCenter) <
-                    Math.abs(closestCenter - viewportCenter) ? post : closest;
-            }, null);
+            const targetPost = DOMUtils.findPostNearestPlacement(visiblePosts);
 
             if (targetPost) {
                 this.resetFocus();

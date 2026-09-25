@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Bluesky Shortcuts Settings</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+        body {
+            padding: 16px 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 14px;
+        }
+        h1 {
+            font-size: 1.25em;
+            margin: 0 0 12px;
+        }
+        fieldset {
+            border: 1px solid #8884;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 0;
+        }
+        legend {
+            font-weight: 600;
+            padding: 0 4px;
+        }
+        .option-description {
+            opacity: 0.75;
+            margin: 4px 0 0 24px;
+        }
+        [role="status"] {
+            min-height: 1.4em;
+            margin: 8px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bluesky Shortcuts Settings</h1>
+
+    <form id="settings">
+        <fieldset>
+            <legend>Navigation</legend>
+
+            <input type="checkbox" id="alignPostToTop" name="alignPostToTop" aria-describedby="alignPostToTop-description">
+            <label for="alignPostToTop">Align selected post to top of screen</label>
+            <p class="option-description" id="alignPostToTop-description">
+                When moving between posts, keep the selected post just below the header instead of centered on screen.
+            </p>
+        </fieldset>
+
+        <p role="status" id="status"></p>
+    </form>
+
+    <script src="options.js"></script>
+</body>
+</html>

@@ -4,6 +4,11 @@ const ZipPlugin = require('zip-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
+let localConfig = {};
+try {
+    localConfig = require('./config.local.js');
+} catch (e) {}
+
 function generateManifest(browser) {
     const baseManifest = require('./src/manifest.json');
 
@@ -12,6 +17,11 @@ function generateManifest(browser) {
             ...baseManifest,
             content_security_policy: "script-src 'self'; object-src 'self'",
             manifest_version: 2,
+            ...(localConfig.firefoxGuid && {
+                browser_specific_settings: {
+                    gecko: { id: localConfig.firefoxGuid }
+                }
+            }),
         }
     } else {
         return {
@@ -30,10 +40,13 @@ module.exports = (env) => {
     const outputDir = isProduction ? `dist/${browser}` : `build/${browser}`;
 
     const config = {
-        entry: './src/content-scripts/main.js',
+        entry: {
+            main: './src/content-scripts/main.js',
+            options: './src/ui/options/options.js',
+        },
         output: {
             path: path.resolve(__dirname, outputDir),
-            filename: 'main.js',
+            filename: '[name].js',
         },
         mode: isProduction ? 'production' : 'development',
         optimization: {
@@ -58,6 +71,7 @@ module.exports = (env) => {
                     },
                     { from: "LICENSE" },
                     { from: "assets/icons", to: "icons" },
+                    { from: "src/ui/options/options.html", to: "options.html" },
                 ]
             }),
             new webpack.DefinePlugin({

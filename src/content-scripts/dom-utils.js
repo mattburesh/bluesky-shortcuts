@@ -1,3 +1,12 @@
+import Settings from '../utils/settings';
+
+// space left between the sticky header and a post scrolled beneath it
+const HEADER_GAP = 12;
+// sticky elements taller than this are content, not the page header
+const MAX_HEADER_HEIGHT = 200;
+// used when no header can be measured
+const DEFAULT_HEADER_OFFSET = 60;
+
 export default class DOMUtils {
     static async waitForElement(selector, timeout = 5000, signal, retryOptions = { maxRetries: 3, retryDelay: 2000 }) {
         let retryCount = 0;
@@ -158,27 +167,70 @@ export default class DOMUtils {
             return;
         }
 
-        const header = document.querySelector('[data-testid="homeScreenFeedTabs"]');
-        const headerOffset = header ? header.offsetHeight + 12 : 60;
-
-        // try to center the post if there is enough space to do so
-        const elementRect = element.getBoundingClientRect();
-        const elementHeight = elementRect.height;
-        const viewportHeight = window.innerHeight;
-
-        const availableHeight = viewportHeight - headerOffset;
-
-        let scrollPosition;
-
-        if (elementHeight > availableHeight) {
-            scrollPosition = window.pageYOffset + elementRect.top - headerOffset;
-        } else {
-            scrollPosition = window.pageYOffset + elementRect.top - headerOffset - (availableHeight / 2 - elementHeight / 2);
+        const alignPostToTop = Settings.get('alignPostToTop');
+        if (options.onlyIfAligned && !alignPostToTop) {
+            return;
         }
+
+        const headerOffset = DOMUtils.getHeaderOffset();
+        const elementRect = element.getBoundingClientRect();
+        const availableHeight = window.innerHeight - headerOffset;
+
+        // align to the top when requested or when the post is too tall to center
+        const alignTop = alignPostToTop || elementRect.height > availableHeight;
+        const centeringOffset = alignTop ? 0 : availableHeight / 2 - elementRect.height / 2;
+
         window.scrollTo({
-            top: Math.max(0, scrollPosition),
+            top: Math.max(0, window.pageYOffset + elementRect.top - headerOffset - centeringOffset),
             behavior: options.behavior || 'smooth'
         });
+    }
+
+    /**
+     * Find the post nearest to where navigation places posts: the top edge
+     * nearest the header when aligned to top, otherwise the center nearest
+     * the middle of the viewport.
+     * @param {Element[]} posts - Non-empty list of candidate posts
+     * @returns {Element} The nearest post
+     */
+    static findPostNearestPlacement(posts) {
+        const alignPostToTop = Settings.get('alignPostToTop');
+        const targetLine = alignPostToTop ? DOMUtils.getHeaderOffset() : window.innerHeight / 2;
+
+        let nearest = posts[0];
+        let nearestDistance = Infinity;
+        for (const post of posts) {
+            const rect = post.getBoundingClientRect();
+            const anchor = alignPostToTop ? rect.top : rect.top + rect.height / 2;
+            const distance = Math.abs(anchor - targetLine);
+            if (distance < nearestDistance) {
+                nearest = post;
+                nearestDistance = distance;
+            }
+        }
+        return nearest;
+    }
+
+    static getHeaderOffset() {
+        let bottom = 0;
+
+        const feedTabs = document.querySelector('[data-testid="homeScreenFeedTabs"]');
+        if (feedTabs && feedTabs.offsetHeight > 0) {
+            bottom = feedTabs.offsetHeight;
+        } else {
+            const main = document.querySelector('[role="main"]');
+            for (const el of main?.querySelectorAll('div[style*="position: sticky"]') ?? []) {
+                const style = getComputedStyle(el);
+                if (style.position !== 'sticky' || parseInt(style.top, 10) !== 0) continue;
+
+                const rect = el.getBoundingClientRect();
+                if (rect.top <= 1 && rect.height > 0 && rect.height < MAX_HEADER_HEIGHT && rect.bottom > bottom) {
+                    bottom = rect.bottom;
+                }
+            }
+        }
+
+        return bottom > 0 ? bottom + HEADER_GAP : DEFAULT_HEADER_OFFSET;
     }
 
     static findPostByCurrentPosition(visiblePosts, currentPost) {
