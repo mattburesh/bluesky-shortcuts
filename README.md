@@ -18,6 +18,14 @@ A browser extension for adding shortcuts to bsky.app.
     1. (or enter `about:debugging#/runtime/this-firefox` in the address bar)
 5. Click `Load Temporary Add-on`, and select `bsky-shortcuts/build`
 
+Settings are stored with `storage.sync`, which Firefox only allows for add-ons with an ID. To test settings in a temporary add-on, create a `config.local.js` in the project root:
+
+```js
+module.exports = {
+    firefoxGuid: "your-addon-id@example.com"
+};
+```
+
 ### Chrome
 
 1. Run `nvm install` to install Node v24.16.0
@@ -79,7 +87,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 | <kbd>g</kbd> <kbd>f</kbd>       | Go to feeds                        |
 | <kbd>g</kbd> <kbd>l</kbd>       | Go to lists                        |
 | <kbd>g</kbd> <kbd>s</kbd>       | Go to settings                     |
-
 
 
 ## Changelog
