@@ -144,8 +144,8 @@ class BlueSkyShortcuts {
             [config.shortcuts.focusSearch]: {
                 action: this.focusSearch.bind(this)
             },
-            [config.shortcuts.expandPhoto]: {
-                action: this.expandPhoto.bind(this)
+            [config.shortcuts.togglePhoto]: {
+                action: this.togglePhoto.bind(this)
             },
             [config.shortcuts.loadMore]: {
                 action: this.loadMore.bind(this)
@@ -713,7 +713,12 @@ class BlueSkyShortcuts {
         return false;
     }
 
-    expandPhoto() {
+    togglePhoto() {
+        if (DOMUtils.isLightboxOpen()) {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            return;
+        }
+
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 

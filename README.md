@@ -59,7 +59,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 | <kbd>r</kbd>                    | Reply to selected post             |
 | <kbd>t</kbd>                    | Repost (press again to undo)       |
 | <kbd>Shift</kbd> + <kbd>t</kbd> | Quote post                         |
-| <kbd>o</kbd>                    | Expand image                       |
+| <kbd>o</kbd>                    | Expand/collapse image              |
 | <kbd>h</kbd>                    | Hide post                          |
 | <kbd>b</kbd>                    | Block account                      |
 | <kbd>m</kbd>                    | Mute account                       |

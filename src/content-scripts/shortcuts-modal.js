@@ -20,7 +20,7 @@ class ShortcutsModal {
                     { key: 'r', description: 'Reply to post' },
                     { key: 't', description: 'Repost post' },
                     { modifier: 'Shift', key: 't', description: 'Quote post' },
-                    { key: 'o', description: 'Expand image' },
+                    { key: 'o', description: 'Expand / collapse image' },
                     { key: 'f', description: 'Follow / unfollow (People tab only)' },
                     { key: 'h', description: 'Hide post' },
                     { key: 's', description: 'Save post' },

@@ -249,6 +249,10 @@ export default class DOMUtils {
                element.offsetParent != null
     }
 
+    static isLightboxOpen() {
+        return document.querySelector('[role="dialog"][aria-modal="true"]') !== null;
+    }
+
     static getFeedTabSelector() {
         return window.location.pathname === '/'
             ? '[data-testid="homeScreenFeedTabs"] > div > div'
