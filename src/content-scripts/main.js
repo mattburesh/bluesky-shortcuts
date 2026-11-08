@@ -2,6 +2,15 @@ import config from '../config/shortcuts.json';
 import KeyboardShortcutManager from './keyboard-handler';
 import ShortcutsModal from './shortcuts-modal';
 import DOMUtils from './dom-utils';
+import {
+    FEED_ITEM_SELECTOR,
+    FEED_LIST_SELECTOR,
+    HIGHLIGHTED_LINK_CLASS,
+    HIGHLIGHTED_LINK_SELECTOR,
+    HOME_TAB_CONTAINER_SELECTOR,
+    MENU_ITEM_SELECTOR,
+    THREAD_ITEM_SELECTOR,
+} from './selectors';
 import Logger from '../utils/logger';
 import Settings from '../utils/settings';
 import AppState from './state-management';
@@ -18,6 +27,7 @@ class BlueSkyShortcuts {
         window.__bskyShortcuts = this;
 
         this.lastNavigatedPath = AppState.getCurrentPath();
+        this.photoNavPending = false;
 
         this.appState = new AppState();
         this.initialize().catch(error => {
@@ -62,9 +72,12 @@ class BlueSkyShortcuts {
             }
         };
 
+        this.boundHandlePhotoClick = (event) => this.handlePhotoClick(event);
+
         window.addEventListener('unload', this.boundCleanup);
         window.addEventListener('popstate', this.boundHandleNavigation);
         document.addEventListener('visibilitychange', this.boundHandleVisibilityChange);
+        document.addEventListener('click', this.boundHandlePhotoClick, true);
     }
 
     async waitForAppLoad() {
@@ -115,10 +128,10 @@ class BlueSkyShortcuts {
     createActionMap() {
         return {
             [config.shortcuts.nextPost]: {
-                action: this.moveToNextPost.bind(this)
+                action: () => this.navigatePosts(1)
             },
             [config.shortcuts.previousPost]: {
-                action: this.moveToPreviousPost.bind(this)
+                action: () => this.navigatePosts(-1)
             },
             [config.shortcuts.likePost]: {
                 action: this.likePost.bind(this)
@@ -271,12 +284,12 @@ class BlueSkyShortcuts {
         if (isPostThread) {
             const controller = new AbortController();
             this.appState.updateState({ currentController: controller });
-            DOMUtils.waitForElement('[data-testid*="postThreadItem-by-"]', 5000, controller.signal)
+            DOMUtils.waitForElement(THREAD_ITEM_SELECTOR, 5000, controller.signal)
                 .then(() => new Promise(resolve => setTimeout(resolve, 200)))
                 .then(() => {
                     if (controller.signal.aborted) return;
                     const currentUrl = window.location.href;
-                    const threadItems = [...document.querySelectorAll('[data-testid*="postThreadItem-by-"]')]
+                    const threadItems = [...document.querySelectorAll(THREAD_ITEM_SELECTOR)]
                         .filter(el => el.offsetParent !== null);
                     const targetRkey = pathname.split('/').pop();
                     const targetHandle = pathname.match(/\/profile\/([^/]+)\/post\//)?.[1];
@@ -305,6 +318,71 @@ class BlueSkyShortcuts {
                     this.logger.error('Failed to select nearest post', error);
                 });
             }, 50);
+        }
+    }
+
+    async moveToPhotoPost(direction) {
+        if (this.photoNavPending) return;
+
+        const { currentPost } = this.appState.state;
+        const target = DOMUtils.findPhotoPost(DOMUtils.findVisiblePosts(), currentPost, direction);
+        if (!target) {
+            this.logger.debug('No photo post found');
+            return;
+        }
+
+        this.photoNavPending = true;
+        try {
+            await DOMUtils.closeLightbox();
+
+            this.resetFocus();
+            this.appState.updateState({ currentPost: target, currentLinkIndex: -1 });
+            DOMUtils.safelyScrollIntoView(target, { behavior: 'instant' });
+            DOMUtils.getPostPhoto(target).click();
+
+            await DOMUtils.waitForLightbox(500);
+        } catch (error) {
+            this.logger.error('Failed to move to photo post', error);
+        } finally {
+            this.photoNavPending = false;
+        }
+    }
+
+    handlePhotoClick(event) {
+        if (DOMUtils.isLightboxOpen()) return;
+
+        DOMUtils.waitForLightbox(200)
+            .then(() => {
+                const posts = DOMUtils.findVisiblePosts();
+                const post = posts.find(candidate => candidate.contains(event.target));
+                if (!post || !DOMUtils.getPostPhoto(post)) return;
+
+                if (post !== this.appState.state.currentPost) {
+                    this.resetFocus();
+                    this.appState.updateState({ currentPost: post, currentLinkIndex: -1 });
+                    DOMUtils.safelyScrollIntoView(post, { skipScroll: true });
+                }
+                this.preloadNextPhoto(posts);
+            })
+            .catch(() => {});
+    }
+
+    preloadNextPhoto(posts) {
+        if (!Settings.get('preloadNextImage')) return;
+
+        const nextPost = DOMUtils.findPhotoPost(posts, this.appState.state.currentPost, 1);
+        if (nextPost) {
+            DOMUtils.preloadPostPhoto(nextPost);
+        }
+    }
+
+    navigatePosts(direction) {
+        if (this.photoNavPending || DOMUtils.isLightboxOpen()) {
+            this.moveToPhotoPost(direction);
+        } else if (direction > 0) {
+            this.moveToNextPost();
+        } else {
+            this.moveToPreviousPost();
         }
     }
 
@@ -429,9 +507,9 @@ class BlueSkyShortcuts {
 
         repostButton?.click();
 
-        DOMUtils.waitForElement('[role="menuitem"]', 2000)
+        DOMUtils.waitForElement(MENU_ITEM_SELECTOR, 2000)
             .then(() => {
-                const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
+                const menuArray = Array.from(document.querySelectorAll(MENU_ITEM_SELECTOR));
 
                 if (event.shiftKey) {
                     const quoteItem = menuArray.find(item => item.getAttribute('data-testid') === 'repostDropdownQuoteBtn');
@@ -545,13 +623,13 @@ class BlueSkyShortcuts {
 
         this.logger.debug('Cylcling links');
 
-        document.querySelectorAll('.bsky-highlighted-link').forEach(el => {
-            el.classList.remove('bsky-highlighted-link');
+        document.querySelectorAll(HIGHLIGHTED_LINK_SELECTOR).forEach(el => {
+            el.classList.remove(HIGHLIGHTED_LINK_CLASS);
         });
 
         const contentSelectors = [
             '[data-testid*="postText"]',
-            '[data-testid*="postThreadItem-by-"] > div:last-child > div:last-child > div:nth-child(2)'
+            `${THREAD_ITEM_SELECTOR} > div:last-child > div:last-child > div:nth-child(2)`
         ]
 
         let foundContainer = false;
@@ -567,7 +645,7 @@ class BlueSkyShortcuts {
         }
 
         // Fallback for thread items where postText may be absent despite having inline links. 
-        if (!foundContainer && currentPost.matches('[data-testid*="postThreadItem-by-"]')) {
+        if (!foundContainer && currentPost.matches(THREAD_ITEM_SELECTOR)) {
             // The first child div is the header row (avatar + display name). Exclude its
             // links so profile links don't get cycled. Then dedupe by first occurrence.
             const header = currentPost.querySelector(':scope > div:first-child');
@@ -601,7 +679,7 @@ class BlueSkyShortcuts {
         } else {
             const targetLink = links[newIndex];
             if (targetLink) {
-                targetLink.classList.add('bsky-highlighted-link');
+                targetLink.classList.add(HIGHLIGHTED_LINK_CLASS);
                 targetLink.focus();
                 this.appState.updateState({ currentLinkIndex: newIndex });
             }
@@ -628,8 +706,6 @@ class BlueSkyShortcuts {
     }
 
     waitForFeedLoad() {
-        const feedSelector = '[data-testid*="-feed-flatlist"]';
-
         if (this.appState.state.currentController) {
             this.appState.state.currentController.abort();
         }
@@ -638,7 +714,7 @@ class BlueSkyShortcuts {
         this.appState.updateState({ currentController: controller });
 
         return new Promise((resolve, reject) => {
-            DOMUtils.waitForElement(feedSelector, 5000, controller.signal)
+            DOMUtils.waitForElement(FEED_LIST_SELECTOR, 5000, controller.signal)
                 .then(() => resolve())
                 .catch(error => {
                     if (error === 'cancelled') {
@@ -657,7 +733,7 @@ class BlueSkyShortcuts {
             return;
         }
 
-        const focusedPost = document.activeElement.matches('[data-testid*="feedItem-by-"], [data-testid*="postThreadItem-by-"]')
+        const focusedPost = document.activeElement.matches(`${FEED_ITEM_SELECTOR}, ${THREAD_ITEM_SELECTOR}`)
             ? document.activeElement
             : this.appState.state.currentPost;
 
@@ -702,11 +778,11 @@ class BlueSkyShortcuts {
         const { currentPost, currentLinkIndex } = this.appState.state;
 
         // Check for highlighted link class
-        const highlightedLink = document.querySelector('.bsky-highlighted-link');
+        const highlightedLink = document.querySelector(HIGHLIGHTED_LINK_SELECTOR);
         if (highlightedLink) {
             this.resetFocus();
             highlightedLink.click();
-            highlightedLink.classList.remove('bsky-highlighted-link');
+            highlightedLink.classList.remove(HIGHLIGHTED_LINK_CLASS);
             return true;
         }
 
@@ -714,15 +790,19 @@ class BlueSkyShortcuts {
     }
 
     togglePhoto() {
+        if (this.photoNavPending) return;
+
         if (DOMUtils.isLightboxOpen()) {
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            DOMUtils.closeLightbox();
             return;
         }
+
+        if (DOMUtils.isDialogOpen()) return;
 
         const { currentPost } = this.appState.state;
         if (!currentPost) return;
 
-        const photoLink = currentPost.querySelector('img[src*="feed_thumbnail"]:not(a img)');
+        const photoLink = DOMUtils.getPostPhoto(currentPost);
 
         if (photoLink) {
             photoLink.click();
@@ -781,7 +861,7 @@ class BlueSkyShortcuts {
         refreshTarget.click();
 
         try {
-            await DOMUtils.waitForElement('[data-testid*="-feed-flatlist"]', 5000, newController.signal);
+            await DOMUtils.waitForElement(FEED_LIST_SELECTOR, 5000, newController.signal);
             await new Promise(resolve => setTimeout(resolve, 300));
             const visiblePosts = DOMUtils.findVisiblePosts();
 
@@ -865,7 +945,7 @@ class BlueSkyShortcuts {
                                     const originalHandleFeedTabClick = this.handleFeedTabClick;
                                     this.handleFeedTabClick = () => { };
 
-                                    const tabContainer = await DOMUtils.waitForElement('[data-testid="homeScreenFeedTabs"] > div > div', 2000);
+                                    const tabContainer = await DOMUtils.waitForElement(HOME_TAB_CONTAINER_SELECTOR, 2000);
 
                                     const tabElements = [...tabContainer.children];
                                     if (tabElements.length > 0) {
@@ -956,8 +1036,8 @@ class BlueSkyShortcuts {
         }
 
         try {
-            await DOMUtils.waitForElement('[role="menuitem"]', 2000);
-            const menuArray = Array.from(document.querySelectorAll('[role="menuitem"]'));
+            await DOMUtils.waitForElement(MENU_ITEM_SELECTOR, 2000);
+            const menuArray = Array.from(document.querySelectorAll(MENU_ITEM_SELECTOR));
             const actionBtn = menuArray.find(item => item.getAttribute('data-testid') === testId);
             actionBtn?.click();
         } catch (error) {
@@ -979,8 +1059,8 @@ class BlueSkyShortcuts {
     }
 
     resetFocus() {
-        document.querySelectorAll('.bsky-highlighted-link').forEach(element => {
-            element.classList.remove('bsky-highlighted-link');
+        document.querySelectorAll(HIGHLIGHTED_LINK_SELECTOR).forEach(element => {
+            element.classList.remove(HIGHLIGHTED_LINK_CLASS);
             element.blur();
         })
     }
@@ -995,6 +1075,7 @@ class BlueSkyShortcuts {
         window.removeEventListener('unload', this.boundCleanup);
         window.removeEventListener('popstate', this.boundHandleNavigation);
         document.removeEventListener('visibilitychange', this.boundHandleVisibilityChange);
+        document.removeEventListener('click', this.boundHandlePhotoClick, true);
 
         this.logger.debug('Cleanup complete');
     }

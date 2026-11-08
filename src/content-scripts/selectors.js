@@ -1,0 +1,10 @@
+export const THREAD_ITEM_SELECTOR = '[data-testid*="postThreadItem-by-"]';
+export const FEED_ITEM_SELECTOR = '[data-testid*="feedItem-by-"]';
+export const FEED_LIST_SELECTOR = '[data-testid*="-feed-flatlist"]';
+export const HOME_FEED_TABS_SELECTOR = '[data-testid="homeScreenFeedTabs"]';
+export const HOME_TAB_CONTAINER_SELECTOR = `${HOME_FEED_TABS_SELECTOR} > div > div`;
+export const MENU_ITEM_SELECTOR = '[role="menuitem"]';
+export const DIALOG_SELECTOR = '[role="dialog"]';
+export const LIGHTBOX_SELECTOR = '[role="dialog"][aria-modal="true"]:not(:has([contenteditable="true"], textarea))';
+export const HIGHLIGHTED_LINK_CLASS = 'bsky-highlighted-link';
+export const HIGHLIGHTED_LINK_SELECTOR = `.${HIGHLIGHTED_LINK_CLASS}`;

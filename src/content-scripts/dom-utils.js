@@ -1,4 +1,12 @@
 import Settings from '../utils/settings';
+import {
+    DIALOG_SELECTOR,
+    FEED_ITEM_SELECTOR,
+    HOME_FEED_TABS_SELECTOR,
+    HOME_TAB_CONTAINER_SELECTOR,
+    LIGHTBOX_SELECTOR,
+    THREAD_ITEM_SELECTOR,
+} from './selectors';
 
 // space left between the sticky header and a post scrolled beneath it
 const HEADER_GAP = 12;
@@ -77,9 +85,9 @@ export default class DOMUtils {
         }
         const feedItems = [
             // Main feed items
-            ...document.querySelectorAll('div[data-testid*="feedItem-by-"]'),
+            ...document.querySelectorAll(`div${FEED_ITEM_SELECTOR}`),
             // Thread/reply items
-            ...document.querySelectorAll('div[data-testid*="postThreadItem-by-"]'),
+            ...document.querySelectorAll(`div${THREAD_ITEM_SELECTOR}`),
             // Search results
             ...searchResults
         ].filter(el => el.offsetParent !== null);
@@ -214,7 +222,7 @@ export default class DOMUtils {
     static getHeaderOffset() {
         let bottom = 0;
 
-        const feedTabs = document.querySelector('[data-testid="homeScreenFeedTabs"]');
+        const feedTabs = document.querySelector(HOME_FEED_TABS_SELECTOR);
         if (feedTabs && feedTabs.offsetHeight > 0) {
             bottom = feedTabs.offsetHeight;
         } else {
@@ -249,25 +257,67 @@ export default class DOMUtils {
                element.offsetParent != null
     }
 
+    static isDialogOpen() {
+        return document.querySelector(DIALOG_SELECTOR) !== null;
+    }
+
     static isLightboxOpen() {
-        return document.querySelector('[role="dialog"][aria-modal="true"]') !== null;
+        return document.querySelector(LIGHTBOX_SELECTOR) !== null;
+    }
+
+    static waitForLightbox(timeout) {
+        return DOMUtils.waitForElement(LIGHTBOX_SELECTOR, timeout, null, { maxRetries: 0, retryDelay: 0 });
+    }
+
+    static closeLightbox(timeout = 500) {
+        return new Promise(resolve => {
+            const done = () => {
+                clearTimeout(timer);
+                window.removeEventListener('popstate', done);
+                resolve();
+            };
+            const timer = setTimeout(done, timeout);
+            window.addEventListener('popstate', done);
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        });
+    }
+
+    static getPostPhoto(post) {
+        return post.querySelector('img[src*="feed_thumbnail"]:not(a img)');
+    }
+
+    static findPhotoPost(posts, currentPost, direction) {
+        if (!posts.length) return;
+
+        const anchor = DOMUtils.isValidElement(currentPost) && !posts.includes(currentPost)
+            ? DOMUtils.findPostByCurrentPosition(posts, currentPost)
+            : currentPost;
+        const currentIndex = posts.indexOf(anchor);
+        const candidates = direction > 0
+            ? posts.slice(currentIndex + 1)
+            : posts.slice(0, Math.max(currentIndex, 0)).reverse();
+        return candidates.find(post => DOMUtils.getPostPhoto(post));
+    }
+
+    static preloadPostPhoto(post) {
+        new Image().src = DOMUtils.getPostPhoto(post).src.replace('feed_thumbnail', 'feed_fullsize');
     }
 
     static getFeedTabSelector() {
         return window.location.pathname === '/'
-            ? '[data-testid="homeScreenFeedTabs"] > div > div'
+            ? HOME_TAB_CONTAINER_SELECTOR
             : 'div[role="tablist"] div[role="tab"]';
     }
 
     static getFeedTabs() {
         if (window.location.pathname === '/') {
-            const homeTabs = document.querySelector('[data-testid="homeScreenFeedTabs"] > div > div');
+            const homeTabs = document.querySelector(HOME_TAB_CONTAINER_SELECTOR);
             return homeTabs ? [...homeTabs.children] : [];
         }
 
         const tablist = [...document.querySelectorAll('div[role="tablist"]')].find(list =>
             list.offsetParent !== null &&
-            !list.closest('[data-testid="homeScreenFeedTabs"]')
+            !list.closest(HOME_FEED_TABS_SELECTOR)
         );
         return tablist ? [...tablist.querySelectorAll('div[role="tab"]')] : [];
     }
