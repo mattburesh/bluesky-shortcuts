@@ -1,4 +1,5 @@
 .idea/*
+.helix/*
 *.zip
 config.local.js
 .DS_Store
