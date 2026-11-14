@@ -21,6 +21,8 @@ class ShortcutsModal {
                     { key: 't', description: 'Repost post' },
                     { modifier: 'Shift', key: 't', description: 'Quote post' },
                     { key: 'o', description: 'Expand / collapse image' },
+                    { key: 'j', description: 'Next image post (while image is open)' },
+                    { key: 'k', description: 'Previous image post (while image is open)' },
                     { key: 'f', description: 'Follow / unfollow (People tab only)' },
                     { key: 'h', description: 'Hide post' },
                     { key: 's', description: 'Save post' },

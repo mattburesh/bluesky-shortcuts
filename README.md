@@ -60,6 +60,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to th
 | <kbd>t</kbd>                    | Repost (press again to undo)       |
 | <kbd>Shift</kbd> + <kbd>t</kbd> | Quote post                         |
 | <kbd>o</kbd>                    | Expand/collapse image              |
+| <kbd>j</kbd>                    | Next image post (image open)       |
+| <kbd>k</kbd>                    | Previous image post (image open)   |
 | <kbd>h</kbd>                    | Hide post                          |
 | <kbd>b</kbd>                    | Block account                      |
 | <kbd>m</kbd>                    | Mute account                       |

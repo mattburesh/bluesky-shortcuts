@@ -2,6 +2,7 @@ import Logger from './logger';
 
 const DEFAULTS = {
     alignPostToTop: false,
+    preloadNextImage: false,
 };
 
 const LOAD_TIMEOUT_MS = 1000;
